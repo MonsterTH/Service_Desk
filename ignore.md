@@ -1,2 +1,10 @@
 docker exec -it Service_Desk php artisan migrate <- Esse comando quando estás a utilziar o Docker
 docker exec -it Service_Desk bash
+
+
+1. DB OK
+2. Models ligados OK 
+3. Controllers implementados
+4. API testada no Postman
+5. Auth + roles
+6. filtros + polish

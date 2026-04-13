@@ -8,7 +8,7 @@ use App\Models\Category;
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /categories
      */
     public function index()
     {
@@ -16,34 +16,62 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /categories
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+        ]);
+
+        $category = Category::create([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
+
+        return response()->json($category, 201);
     }
 
     /**
-     * Display the specified resource.
+     * GET /categories/{id}
      */
     public function show(string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+
+        return response()->json($category);
     }
 
     /**
-     * Update the specified resource in storage.
+     * PUT /categories/{id}
      */
     public function update(Request $request, string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
+        ]);
+
+        $category->update($validated);
+
+        return response()->json($category);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /categories/{id}
      */
     public function destroy(string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+
+        $category->delete();
+
+        return response()->json(['message' => 'Category deleted']);
     }
 }

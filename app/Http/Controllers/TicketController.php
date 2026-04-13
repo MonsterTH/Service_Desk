@@ -8,42 +8,116 @@ use App\Models\Ticket;
 class TicketController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /tickets
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Ticket::all();
+        $user = $request->user();
+
+        if ($user->role === 'admin') {
+            return Ticket::with(['category', 'creator', 'assignee'])->get();
+        }
+
+        if ($user->role === 'agent') {
+            return Ticket::with(['category', 'creator', 'assignee'])
+                ->where('assigned_to', $user->id)
+                ->get();
+        }
+
+        return Ticket::with(['category', 'creator', 'assignee'])
+            ->where('created_by', $user->id)
+            ->get();
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /tickets
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high,urgent',
+            'category_id' => 'nullable|exists:categories,id',
+            'assigned_to' => 'nullable|exists:users,id',
+        ]);
+
+        $ticket = Ticket::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'status' => 'open',
+            'priority' => $validated['priority'],
+            'category_id' => $validated['category_id'] ?? null,
+            'assigned_to' => $validated['assigned_to'] ?? null,
+            'created_by' => $request->user()->id,
+        ]);
+
+        return response()->json($ticket, 201);
     }
 
     /**
-     * Display the specified resource.
+     * GET /tickets/{id}
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        //
+        $ticket = Ticket::with(['category', 'creator', 'assignee'])
+            ->findOrFail($id);
+
+        $user = $request->user();
+
+        // regras de acesso
+        if ($user->role === 'employee' && $ticket->created_by !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($user->role === 'agent' && $ticket->assigned_to !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return response()->json($ticket);
     }
 
     /**
-     * Update the specified resource in storage.
+     * PUT /tickets/{id}
      */
     public function update(Request $request, string $id)
     {
-        //
+        $ticket = Ticket::findOrFail($id);
+        $user = $request->user();
+
+        // regras simples
+        if (!in_array($user->role, ['admin', 'agent'])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'sometimes|in:open,in_progress,resolved,closed',
+            'priority' => 'sometimes|in:low,medium,high,urgent',
+            'category_id' => 'nullable|exists:categories,id',
+            'assigned_to' => 'nullable|exists:users,id',
+        ]);
+
+        $ticket->update($validated);
+
+        return response()->json($ticket);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /tickets/{id}
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        //
+        $ticket = Ticket::findOrFail($id);
+        $user = $request->user();
+
+        if ($user->role !== 'admin') {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $ticket->delete();
+
+        return response()->json(['message' => 'Ticket deleted']);
     }
 }
