@@ -78,7 +78,7 @@ class TicketController extends Controller
             'priority'    => $validated['priority'],
             'category_id' => $validated['category_id'] ?? null,
             'assigned_to' => $validated['assigned_to'] ?? null,
-            'created_by'  => $validated['created_by'],
+            'created_by'  => $request->user()->id,
         ]);
 
         return response()->json($ticket->load(['category', 'creator', 'assignee']), 201);
@@ -116,8 +116,6 @@ class TicketController extends Controller
                     new OA\Property(property: 'description', type: 'string'),
                     new OA\Property(property: 'status', type: 'string', enum: ['open', 'in_progress', 'resolved', 'closed']),
                     new OA\Property(property: 'priority', type: 'string', enum: ['low', 'medium', 'high', 'urgent']),
-                    new OA\Property(property: 'category_id', type: 'integer'),
-                    new OA\Property(property: 'assigned_to', type: 'integer'),
                 ]
             )
         ),
@@ -126,7 +124,7 @@ class TicketController extends Controller
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
         $ticket = Ticket::findOrFail($id);
         $validated = $request->validate([
@@ -154,7 +152,7 @@ class TicketController extends Controller
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         $ticket = Ticket::findOrFail($id);
         $ticket->delete();
