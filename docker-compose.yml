@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    container_name: Service_Desk
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+  db:
+    image: mariadb:10.8.3
+    # Uncomment below when on Mac M1
+    # platform: linux/arm64/v8
+    container_name: laravel_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    ports:
+      - 3306:3306
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
