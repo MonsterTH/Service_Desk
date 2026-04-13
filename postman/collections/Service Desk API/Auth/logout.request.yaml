@@ -1,10 +1,12 @@
 $kind: http-request
-name: 'Logout'
+name: Logout
 method: POST
-url: '{{api_base_url}}/logout'
+url: "{{api_base_url}}/logout"
+body:
+  type: json
+  content: ""
 order: 3000
 auth:
   type: bearer
   credentials:
-    - key: token
-      value: '{{token}}'
+    token: "{{token}}"

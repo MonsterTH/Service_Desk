@@ -4,12 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
-
+use OpenApi\Attributes as OA;
 class CategoryController extends Controller
 {
-    /**
-     * GET /categories
-     */
     public function index()
     {
         return Category::all();
