@@ -12,7 +12,9 @@ class CommentController extends Controller
      */
     public function index()
     {
-        return Comment::with(['ticket', 'user'])->get();
+        return response()->json(
+            Comment::with(['ticket', 'user'])->get()
+        );
     }
 
     /**
@@ -21,23 +23,24 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ticket_id' => 'required|exists:tickets,id',
-            'comment' => 'required|string',
+            'ticket_id'   => 'required|exists:tickets,id',
+            'user_id'     => 'required|exists:users,id',
+            'comment'     => 'required|string',
             'is_internal' => 'boolean',
         ]);
 
         $comment = Comment::create([
-            'ticket_id' => $validated['ticket_id'],
-            'user_id' => $request->user()->id,
-            'comment' => $validated['comment'],
+            'ticket_id'   => $validated['ticket_id'],
+            'user_id'     => $validated['user_id'],
+            'comment'     => $validated['comment'],
             'is_internal' => $validated['is_internal'] ?? false,
         ]);
 
-        return response()->json($comment, 201);
+        return response()->json($comment->load(['ticket', 'user']), 201);
     }
 
     /**
-     * GET /comments/{id}
+     * GET /comments/{comment}
      */
     public function show(string $id)
     {
@@ -47,42 +50,28 @@ class CommentController extends Controller
     }
 
     /**
-     * PUT /comments/{id}
+     * PUT /comments/{comment}
      */
     public function update(Request $request, string $id)
     {
         $comment = Comment::findOrFail($id);
 
-        // só autor pode editar (regra simples)
-        if ($comment->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
         $validated = $request->validate([
-            'comment' => 'sometimes|string',
+            'comment'     => 'sometimes|string',
             'is_internal' => 'boolean',
         ]);
 
         $comment->update($validated);
 
-        return response()->json($comment);
+        return response()->json($comment->load(['ticket', 'user']));
     }
 
     /**
-     * DELETE /comments/{id}
+     * DELETE /comments/{comment}
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(string $id)
     {
         $comment = Comment::findOrFail($id);
-
-        // admin ou dono do comentário
-        if (
-            $request->user()->role !== 'admin' &&
-            $comment->user_id !== $request->user()->id
-        ) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
         $comment->delete();
 
         return response()->json(['message' => 'Comment deleted']);

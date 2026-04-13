@@ -7,17 +7,25 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AuthController;
 
+/*
+|--------------------------------------------------------------------------
+| Auth routes
+|--------------------------------------------------------------------------
+*/
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    Route::apiResource('tickets', TicketController::class);
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('comments', CommentController::class);
 });
+
+/*
+|--------------------------------------------------------------------------
+| CRUD resource routes (Tickets, Categories, Comments)
+|--------------------------------------------------------------------------
+*/
+Route::apiResource('tickets',    TicketController::class);
+Route::apiResource('categories', CategoryController::class);
+Route::apiResource('comments',   CommentController::class);
