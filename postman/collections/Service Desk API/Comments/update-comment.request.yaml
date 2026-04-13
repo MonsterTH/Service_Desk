@@ -1,0 +1,22 @@
+$kind: http-request
+name: 'Update Comment'
+method: PUT
+url: '{{api_base_url}}/comments/{{comment_id}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
+body:
+  type: json
+  content: |-
+    {
+      "ticket_id": 1,
+      "user_id": 1,
+      "comment": "Investigating the issue",
+      "is_internal": false
+    }

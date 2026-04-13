@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'Delete Ticket'
+method: DELETE
+url: '{{api_base_url}}/tickets/{{ticket_id}}'
+order: 6000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'

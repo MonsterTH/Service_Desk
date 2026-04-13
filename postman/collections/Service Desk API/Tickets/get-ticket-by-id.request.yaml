@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'Get Ticket By ID'
+method: GET
+url: '{{api_base_url}}/tickets/{{ticket_id}}'
+order: 3000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'

@@ -1,0 +1,25 @@
+$kind: http-request
+name: 'Update Ticket'
+method: PUT
+url: '{{api_base_url}}/tickets/{{ticket_id}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "Printer issue",
+      "description": "Office printer is jammed",
+      "status": "open",
+      "priority": "high",
+      "created_by": 1,
+      "assigned_to": 2,
+      "category_id": 1
+    }

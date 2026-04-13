@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Create Category'
+method: POST
+url: '{{api_base_url}}/categories'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
+body:
+  type: json
+  content: |-
+    {
+      "name": "Hardware",
+      "description": "Hardware-related issues",
+      "is_active": true
+    }

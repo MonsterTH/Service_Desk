@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'List Categories'
+method: GET
+url: '{{api_base_url}}/categories'
+order: 1000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{token}}'
