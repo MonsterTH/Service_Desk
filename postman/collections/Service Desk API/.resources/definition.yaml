@@ -1,13 +1,9 @@
 $kind: collection
-name: 'Service Desk API'
+name: Service Desk API
 variables:
-  - key: api_base_url
-    value: '{{base_url}}/api'
-  - key: token
-    value: ''
-  - key: ticket_id
-    value: '1'
-  - key: category_id
-    value: '1'
-  - key: comment_id
-    value: '1'
+  api_base_url: "{{base_url}}/api"
+  token: ""
+  ticket_id: "1"
+  category_id: "1"
+  comment_id: "1"
+  base_url: ""
