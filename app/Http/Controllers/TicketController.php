@@ -18,27 +18,23 @@ class TicketController extends Controller
             new OA\Response(
                 response: 200,
                 description: 'List of tickets',
-                content: new OA\MediaType(
-                    mediaType: 'application/json',
-                    schema: new OA\Schema(
-                        type: 'object',
-                        properties: [
-                            new OA\Property(
-                                property: 'data',
-                                type: 'array',
-                                items: new OA\Items(
-                                    type: 'object',
-                                    properties: [
-                                        new OA\Property(property: 'id', type: 'integer'),
-                                        new OA\Property(property: 'title', type: 'string'),
-                                        new OA\Property(property: 'description', type: 'string'),
-                                        new OA\Property(property: 'status', type: 'string'),
-                                        new OA\Property(property: 'priority', type: 'string'),
-                                    ]
-                                )
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer'),
+                                    new OA\Property(property: 'title', type: 'string'),
+                                    new OA\Property(property: 'description', type: 'string'),
+                                    new OA\Property(property: 'status', type: 'string'),
+                                    new OA\Property(property: 'priority', type: 'string'),
+                                ]
                             )
-                        ]
-                    )
+                        )
+                    ]
                 )
             )
         ]
@@ -47,7 +43,7 @@ class TicketController extends Controller
     {
         $this->authorize('viewAny', Ticket::class);
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         $query = Ticket::with(['category', 'creator', 'assignee'])
             ->whereNotIn('status', ['resolved', 'closed']);
