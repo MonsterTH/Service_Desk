@@ -18,7 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::patch('tickets/{ticket}/assign', [TicketController::class, 'assign']);
     Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
-
+    Route::patch('tickets/{ticket}/priority', [TicketController::class, 'updatePriority']);
 
     Route::apiResource('comments', CommentController::class);
 

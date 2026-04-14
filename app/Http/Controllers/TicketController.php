@@ -45,24 +45,27 @@ class TicketController extends Controller
     )]
     public function index()
     {
-        if (app()->runningInConsole())
-        {
-            return response()->json([]);
-        }
-
         $this->authorize('viewAny', Ticket::class);
-
-        $query = Ticket::with(['category', 'creator', 'assignee']);
 
         $user = auth()->user();
 
-        if ($user && $user->hasRole('employee')) {
+        $query = Ticket::with(['category', 'creator', 'assignee'])
+            ->whereNotIn('status', ['resolved', 'closed']);
+
+        if ($user->hasRole('admin')) {
+            return response()->json($query->latest()->paginate(20));
+        }
+
+        if ($user->hasRole('agent')) {
+            $query->where('assigned_to', $user->id)
+                ->whereIn('status', ['open', 'in_progress']);
+        }
+
+        if ($user->hasRole('employee')) {
             $query->where('created_by', $user->id);
         }
 
-        return response()->json(
-            $query->latest()->paginate(20)
-        );
+        return response()->json($query->latest()->paginate(20));
     }
 
     #[OA\Post(
@@ -75,11 +78,8 @@ class TicketController extends Controller
                 required: ['title', 'priority'],
                 properties: [
                     new OA\Property(property: 'title', type: 'string', example: 'My ticket'),
-                    new OA\Property(property: 'description', type: 'string', example: 'Ticket description'),
-                    new OA\Property(property: 'status', type: 'string', enum: ['open', 'in_progress', 'resolved', 'closed']),
-                    new OA\Property(property: 'priority', type: 'string', enum: ['low', 'medium', 'high', 'urgent']),
-                    new OA\Property(property: 'category_id', type: 'integer', example: 1),
-                    new OA\Property(property: 'assigned_to', type: 'integer', example: 1),
+                    new OA\Property(property: 'description', type: 'string'),
+                    new OA\Property(property: 'category_id', type: 'integer', default: 1),
                 ]
             )
         ),
@@ -95,23 +95,17 @@ class TicketController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'status'      => 'sometimes|in:open,in_progress,resolved,closed',
-            'priority'    => 'required|in:low,medium,high,urgent',
+            'priority'    => 'nullable|in:low,medium,high,urgent',
             'category_id' => 'nullable|exists:categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
         ]);
-
-        if ($request->user()->hasRole('employee')) {
-            unset($validated['assigned_to']);
-        }
 
         $ticket = Ticket::create([
             'title'       => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'status'      => $validated['status'] ?? 'open',
-            'priority'    => $validated['priority'],
+            'status'      => 'open',
+            'priority'    => $validated['priority'] ?? 'low',
             'category_id' => $validated['category_id'] ?? null,
-            'assigned_to' => $validated['assigned_to'] ?? null,
+            'assigned_to' => null,
             'created_by'  => $request->user()->id,
         ]);
 
@@ -148,8 +142,6 @@ class TicketController extends Controller
                 properties: [
                     new OA\Property(property: 'title', type: 'string'),
                     new OA\Property(property: 'description', type: 'string'),
-                    new OA\Property(property: 'status', type: 'string', enum: ['open', 'in_progress', 'resolved', 'closed']),
-                    new OA\Property(property: 'priority', type: 'string', enum: ['low', 'medium', 'high', 'urgent']),
                 ]
             )
         ),
@@ -161,23 +153,20 @@ class TicketController extends Controller
     public function update(Request $request, Ticket $ticket)
     {
         $this->authorize('update', $ticket);
+
         $validated = $request->validate([
-            'title'       => 'sometimes|string|max:255',
+            'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'status'      => 'sometimes|in:open,in_progress,resolved,closed',
-            'priority'    => 'sometimes|in:low,medium,high,urgent',
         ]);
 
         $ticket->update($validated);
 
-        return response()->json(
-            $ticket
-        );
+        return response()->json($ticket);
     }
 
     #[OA\Delete(
         path: '/api/tickets/{ticket}',
-        summary: 'Delete a ticket',
+        summary: 'Delete a ticket (Admin only)',
         tags: ['Tickets'],
         parameters: [
             new OA\Parameter(name: 'ticket', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
@@ -197,6 +186,38 @@ class TicketController extends Controller
         ]);
     }
 
+    #[OA\Patch(
+        path: '/api/tickets/{ticket}/assign',
+        summary: 'Assign a ticket to a user (Agent/Admin only)',
+        tags: ['Tickets'],
+        parameters: [
+            new OA\Parameter(
+                name: 'ticket',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['assigned_to'],
+                properties: [
+                    new OA\Property(
+                        property: 'assigned_to',
+                        type: 'integer',
+                        example: 2
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Ticket assigned successfully'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+
     public function assign(Request $request, Ticket $ticket)
     {
         $this->authorize('assign', $ticket);
@@ -205,12 +226,50 @@ class TicketController extends Controller
             'assigned_to' => 'required|exists:users,id',
         ]);
 
+        $user = auth()->user();
+
+        if ($user->hasRole('agent') && $validated['assigned_to'] != $user->id) {
+            abort(403, 'Agents can only assign tickets to themselves.');
+        }
+
         $ticket->update([
             'assigned_to' => $validated['assigned_to'],
         ]);
 
         return response()->json($ticket);
     }
+
+    #[OA\Patch(
+        path: '/api/tickets/{ticket}/status',
+        summary: 'Update ticket status (Agent/Admin only)',
+        tags: ['Tickets'],
+        parameters: [
+            new OA\Parameter(
+                name: 'ticket',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['status'],
+                properties: [
+                    new OA\Property(
+                        property: 'status',
+                        type: 'string',
+                        enum: ['open', 'in_progress', 'resolved', 'closed']
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Status updated successfully'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
 
     public function updateStatus(Request $request, Ticket $ticket)
     {
@@ -225,5 +284,56 @@ class TicketController extends Controller
         ]);
 
         return response()->json($ticket);
+    }
+
+    #[OA\Patch(
+        path: '/api/tickets/{ticket}/priority',
+        summary: 'Update ticket priority (Agent/Admin only)',
+        tags: ['Tickets'],
+        parameters: [
+            new OA\Parameter(
+                name: 'ticket',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['priority'],
+                properties: [
+                    new OA\Property(
+                        property: 'priority',
+                        type: 'string',
+                        enum: ['low', 'medium', 'high', 'urgent']
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Priority updated'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+
+    public function updatePriority(Request $request, Ticket $ticket)
+    {
+        // chama a policy
+        $this->authorize('updatePriority', $ticket);
+
+        $validated = $request->validate([
+            'priority' => 'required|in:low,medium,high,urgent',
+        ]);
+
+        $ticket->update([
+            'priority' => $validated['priority'],
+        ]);
+
+        return response()->json([
+            'message' => 'Priority updated successfully',
+            'ticket' => $ticket
+        ]);
     }
 }

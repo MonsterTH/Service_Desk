@@ -646,34 +646,11 @@
                                         "example": "My ticket"
                                     },
                                     "description": {
-                                        "type": "string",
-                                        "example": "Ticket description"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "open",
-                                            "in_progress",
-                                            "resolved",
-                                            "closed"
-                                        ]
-                                    },
-                                    "priority": {
-                                        "type": "string",
-                                        "enum": [
-                                            "low",
-                                            "medium",
-                                            "high",
-                                            "urgent"
-                                        ]
+                                        "type": "string"
                                     },
                                     "category_id": {
                                         "type": "integer",
-                                        "example": 1
-                                    },
-                                    "assigned_to": {
-                                        "type": "integer",
-                                        "example": 1
+                                        "default": 1
                                     }
                                 },
                                 "type": "object"
@@ -743,24 +720,6 @@
                                     },
                                     "description": {
                                         "type": "string"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "open",
-                                            "in_progress",
-                                            "resolved",
-                                            "closed"
-                                        ]
-                                    },
-                                    "priority": {
-                                        "type": "string",
-                                        "enum": [
-                                            "low",
-                                            "medium",
-                                            "high",
-                                            "urgent"
-                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -781,7 +740,7 @@
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Delete a ticket",
+                "summary": "Delete a ticket (Admin only)",
                 "operationId": "bb7be4d54b9a05e0df84e30a5c97f18a",
                 "parameters": [
                     {
@@ -799,6 +758,163 @@
                     },
                     "404": {
                         "description": "Ticket not found"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/assign": {
+            "patch": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Assign a ticket to a user (Agent/Admin only)",
+                "operationId": "ddfde2af9a12d21efa09ef75265f1ff5",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "assigned_to"
+                                ],
+                                "properties": {
+                                    "assigned_to": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ticket assigned successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/status": {
+            "patch": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Update ticket status (Agent/Admin only)",
+                "operationId": "663c972594f16cfaccdf5d1db5887aeb",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "open",
+                                            "in_progress",
+                                            "resolved",
+                                            "closed"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status updated successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/priority": {
+            "patch": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Update ticket priority (Agent/Admin only)",
+                "operationId": "92628c3d5f6229a6f6ea468e7192823b",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "priority"
+                                ],
+                                "properties": {
+                                    "priority": {
+                                        "type": "string",
+                                        "enum": [
+                                            "low",
+                                            "medium",
+                                            "high",
+                                            "urgent"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Priority updated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
