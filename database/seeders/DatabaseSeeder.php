@@ -13,10 +13,21 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ROLES (OBRIGATÓRIO)
-        Role::firstOrCreate(['name' => 'admin']);
-        Role::firstOrCreate(['name' => 'agent']);
-        Role::firstOrCreate(['name' => 'employee']);
+        // ROLES
+        Role::firstOrCreate([
+            'name' => 'admin',
+            'guard_name' => 'web'
+        ]);
+
+        Role::firstOrCreate([
+            'name' => 'agent',
+            'guard_name' => 'web'
+        ]);
+
+        Role::firstOrCreate([
+            'name' => 'employee',
+            'guard_name' => 'web'
+        ]);
 
         // USERS
         $admin = User::factory()->create([
