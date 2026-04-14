@@ -7,46 +7,54 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\Ticket;
 use App\Models\Comment;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        //USERS
+        // ROLES (OBRIGATÓRIO)
+        Role::firstOrCreate(['name' => 'admin']);
+        Role::firstOrCreate(['name' => 'agent']);
+        Role::firstOrCreate(['name' => 'employee']);
+
+        // USERS
         $admin = User::factory()->create([
-            'name'     => 'Admin User',
-            'email'    => 'admin@example.com',
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
             'password' => bcrypt('password'),
-            'role'     => 'admin',
         ]);
+        $admin->assignRole('admin');
 
         $agent = User::factory()->create([
-            'name'     => 'Support Agent',
-            'email'    => 'agent@example.com',
+            'name' => 'Support Agent',
+            'email' => 'agent@example.com',
             'password' => bcrypt('password'),
-            'role'     => 'agent',
         ]);
+        $agent->assignRole('agent');
 
         $employee = User::factory()->create([
-            'name'     => 'Employee User',
-            'email'    => 'employee@example.com',
+            'name' => 'Employee User',
+            'email' => 'employee@example.com',
             'password' => bcrypt('password'),
-            'role'     => 'employee',
         ]);
+        $employee->assignRole('employee');
 
-        User::factory(5)->create(['role' => 'employee']);
+        // User::factory(5)->create()->each(function ($user) {
+        //     $user->assignRole('employee');
+        // });
 
-        //CATEGORIES
+        // CATEGORIES
         $categories = Category::factory(5)->create();
 
-        //TICKETS
+        // TICKETS
         Ticket::factory(20)->create([
             'created_by' => $employee->id,
             'assigned_to' => $agent->id,
             'category_id' => $categories->random()->id,
         ]);
 
-        //COMMENTS
+        // COMMENTS
         Comment::factory(50)->create();
     }
 }

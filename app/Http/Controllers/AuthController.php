@@ -56,8 +56,10 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => strtolower($request->email),
-            'password' => $request->password,
+            'password' => bcrypt($request->password),
         ]);
+
+        $user->assignRole('employee');
 
         $token = $user->createToken('api-token')->plainTextToken;
 
@@ -126,27 +128,6 @@ class AuthController extends Controller
             'token' => $token
         ]);
     }
-
-    // #[OA\Post(
-    //     path: '/api/logout',
-    //     summary: 'Logout a user',
-    //     tags: ['Auth'],
-    //     requestBody: new OA\RequestBody(
-    //         required: true,
-    //         content: new OA\JsonContent(
-    //             required: ['token'],
-    //             properties: [
-    //                 new OA\Property(property: 'token', type: 'string'),
-    //             ]
-    //         )
-    //     ),
-    //     responses: [
-    //         new OA\Response(
-    //             response: 200,
-    //             description: 'User logged out successfully'
-    //         )
-    //     ]
-    // )]
 
     #[OA\Post(
         path: '/api/logout',
