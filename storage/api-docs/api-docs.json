@@ -593,39 +593,32 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "title": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string"
-                                            },
-                                            "status": {
-                                                "type": "string",
-                                                "enum": [
-                                                    "open",
-                                                    "in_progress",
-                                                    "resolved",
-                                                    "closed"
-                                                ]
-                                            },
-                                            "priority": {
-                                                "type": "string",
-                                                "enum": [
-                                                    "low",
-                                                    "medium",
-                                                    "high",
-                                                    "urgent"
-                                                ]
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "priority": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
                                             }
-                                        },
-                                        "type": "object"
-                                    }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -645,8 +638,7 @@
                             "schema": {
                                 "required": [
                                     "title",
-                                    "priority",
-                                    "created_by"
+                                    "priority"
                                 ],
                                 "properties": {
                                     "title": {
@@ -676,10 +668,6 @@
                                         ]
                                     },
                                     "category_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "created_by": {
                                         "type": "integer",
                                         "example": 1
                                     },

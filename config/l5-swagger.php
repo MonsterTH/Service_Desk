@@ -68,7 +68,6 @@ return [
                 'api' => [],
                 'asset' => [],
                 'docs' => [],
-                'oauth2_callback' => [],
             ],
 
             /*

@@ -13,7 +13,7 @@ class TicketPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,9 @@ class TicketPolicy
      */
     public function view(User $user, Ticket $ticket): bool
     {
-        return false;
+        return $user->hasRole('admin')
+            || $user->hasRole('agent')
+            || $ticket->created_by === $user->id;
     }
 
     /**
@@ -29,7 +31,8 @@ class TicketPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasRole('employee')
+            || $user->hasRole('admin');
     }
 
     /**
@@ -37,7 +40,9 @@ class TicketPolicy
      */
     public function update(User $user, Ticket $ticket): bool
     {
-        return false;
+        return $user->hasRole('admin')
+            || $user->hasRole('agent')
+            || $ticket->created_by === $user->id;
     }
 
     /**
@@ -45,22 +50,16 @@ class TicketPolicy
      */
     public function delete(User $user, Ticket $ticket): bool
     {
-        return false;
+        return $user->hasRole('admin');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Ticket $ticket): bool
+    public function assign(User $user, Ticket $ticket): bool
     {
-        return false;
+        return $user->hasAnyRole(['agent', 'admin']);
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Ticket $ticket): bool
+    public function updateStatus(User $user, Ticket $ticket): bool
     {
-        return false;
+        return $user->hasAnyRole(['agent', 'admin']);
     }
 }

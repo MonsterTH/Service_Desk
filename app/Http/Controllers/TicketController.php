@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Ticket;
 use OpenApi\Attributes as OA;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class TicketController extends Controller
 {
+    use AuthorizesRequests;
+
     #[OA\Get(
         path: '/api/tickets',
         summary: 'List all tickets',
@@ -16,22 +18,50 @@ class TicketController extends Controller
             new OA\Response(
                 response: 200,
                 description: 'List of tickets',
-                content: new OA\JsonContent(type: 'array', items: new OA\Items(
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'title', type: 'string'),
-                        new OA\Property(property: 'description', type: 'string'),
-                        new OA\Property(property: 'status', type: 'string', enum: ['open', 'in_progress', 'resolved', 'closed']),
-                        new OA\Property(property: 'priority', type: 'string', enum: ['low', 'medium', 'high', 'urgent']),
-                    ]
-                ))
+                content: new OA\MediaType(
+                    mediaType: 'application/json',
+                    schema: new OA\Schema(
+                        type: 'object',
+                        properties: [
+                            new OA\Property(
+                                property: 'data',
+                                type: 'array',
+                                items: new OA\Items(
+                                    type: 'object',
+                                    properties: [
+                                        new OA\Property(property: 'id', type: 'integer'),
+                                        new OA\Property(property: 'title', type: 'string'),
+                                        new OA\Property(property: 'description', type: 'string'),
+                                        new OA\Property(property: 'status', type: 'string'),
+                                        new OA\Property(property: 'priority', type: 'string'),
+                                    ]
+                                )
+                            )
+                        ]
+                    )
+                )
             )
         ]
     )]
     public function index()
     {
+        if (app()->runningInConsole())
+        {
+            return response()->json([]);
+        }
+
+        $this->authorize('viewAny', Ticket::class);
+
+        $query = Ticket::with(['category', 'creator', 'assignee']);
+
+        $user = auth()->user();
+
+        if ($user && $user->hasRole('employee')) {
+            $query->where('created_by', $user->id);
+        }
+
         return response()->json(
-            Ticket::with(['category', 'creator', 'assignee'])->get()
+            $query->latest()->paginate(20)
         );
     }
 
@@ -42,14 +72,13 @@ class TicketController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['title', 'priority', 'created_by'],
+                required: ['title', 'priority'],
                 properties: [
                     new OA\Property(property: 'title', type: 'string', example: 'My ticket'),
                     new OA\Property(property: 'description', type: 'string', example: 'Ticket description'),
                     new OA\Property(property: 'status', type: 'string', enum: ['open', 'in_progress', 'resolved', 'closed']),
                     new OA\Property(property: 'priority', type: 'string', enum: ['low', 'medium', 'high', 'urgent']),
                     new OA\Property(property: 'category_id', type: 'integer', example: 1),
-                    new OA\Property(property: 'created_by', type: 'integer', example: 1),
                     new OA\Property(property: 'assigned_to', type: 'integer', example: 1),
                 ]
             )
@@ -61,6 +90,8 @@ class TicketController extends Controller
     )]
     public function store(Request $request)
     {
+        $this->authorize('create', Ticket::class);
+
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -68,8 +99,11 @@ class TicketController extends Controller
             'priority'    => 'required|in:low,medium,high,urgent',
             'category_id' => 'nullable|exists:categories,id',
             'assigned_to' => 'nullable|exists:users,id',
-            'created_by'  => 'required|exists:users,id',
         ]);
+
+        if ($request->user()->hasRole('employee')) {
+            unset($validated['assigned_to']);
+        }
 
         $ticket = Ticket::create([
             'title'       => $validated['title'],
@@ -81,7 +115,7 @@ class TicketController extends Controller
             'created_by'  => $request->user()->id,
         ]);
 
-        return response()->json($ticket->load(['category', 'creator', 'assignee']), 201);
+        return response()->json($ticket, 201);
     }
 
     #[OA\Get(
@@ -98,7 +132,8 @@ class TicketController extends Controller
     )]
     public function show(Ticket $ticket)
     {
-        return response()->json($ticket->load(['category', 'creator', 'assignee']));
+        $this->authorize('view', $ticket);
+        return response()->json($ticket);
     }
 
     #[OA\Put(
@@ -125,20 +160,18 @@ class TicketController extends Controller
     )]
     public function update(Request $request, Ticket $ticket)
     {
+        $this->authorize('update', $ticket);
         $validated = $request->validate([
             'title'       => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'status'      => 'sometimes|in:open,in_progress,resolved,closed',
             'priority'    => 'sometimes|in:low,medium,high,urgent',
-            'category_id' => 'nullable|exists:categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
-            'created_by'  => 'sometimes|exists:users,id',
         ]);
 
         $ticket->update($validated);
 
         return response()->json(
-            $ticket->load(['category', 'creator', 'assignee'])
+            $ticket
         );
     }
 
@@ -156,10 +189,41 @@ class TicketController extends Controller
     )]
     public function destroy(Ticket $ticket)
     {
+        $this->authorize('delete', $ticket);
         $ticket->delete();
 
         return response()->json([
             'message' => 'Ticket deleted'
         ]);
+    }
+
+    public function assign(Request $request, Ticket $ticket)
+    {
+        $this->authorize('assign', $ticket);
+
+        $validated = $request->validate([
+            'assigned_to' => 'required|exists:users,id',
+        ]);
+
+        $ticket->update([
+            'assigned_to' => $validated['assigned_to'],
+        ]);
+
+        return response()->json($ticket);
+    }
+
+    public function updateStatus(Request $request, Ticket $ticket)
+    {
+        $this->authorize('updateStatus', $ticket);
+
+        $validated = $request->validate([
+            'status' => 'required|in:open,in_progress,resolved,closed',
+        ]);
+
+        $ticket->update([
+            'status' => $validated['status'],
+        ]);
+
+        return response()->json($ticket);
     }
 }

@@ -19,6 +19,8 @@ class Ticket extends Model
         'category_id',
     ];
 
+    protected $with = ['category', 'creator', 'assignee'];
+
     /*
     |-----------------------------
     | RELATIONSHIPS
