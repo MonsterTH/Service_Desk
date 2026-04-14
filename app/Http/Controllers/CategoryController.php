@@ -70,11 +70,11 @@ class CategoryController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/categories/{id}',
+        path: '/api/categories/{category}',
         summary: 'Get a category by ID',
         tags: ['Categories'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+            new OA\Parameter(name: 'category', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
         ],
         responses: [
             new OA\Response(response: 200, description: 'Category found'),
@@ -87,11 +87,11 @@ class CategoryController extends Controller
     }
 
     #[OA\Put(
-        path: '/api/categories/{id}',
+        path: '/api/categories/{category}',
         summary: 'Update a category',
         tags: ['Categories'],
         parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+            new OA\Parameter(name: 'category', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
         ],
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
@@ -107,10 +107,8 @@ class CategoryController extends Controller
             new OA\Response(response: 404, description: 'Category not found'),
         ]
     )]
-    public function update(Request $request, int $id)
+    public function update(Request $request, Category $category)
     {
-        $category = Category::findOrFail($id);
-
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
@@ -123,12 +121,12 @@ class CategoryController extends Controller
     }
 
     #[OA\Delete(
-        path: '/api/categories/{id}',
+        path: '/api/categories/{category}',
         summary: 'Delete a category',
         tags: ['Categories'],
         parameters: [
             new OA\Parameter(
-                name: 'id',
+                name: 'category',
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(type: 'integer')
@@ -139,10 +137,8 @@ class CategoryController extends Controller
             new OA\Response(response: 404, description: 'Category not found'),
         ]
     )]
-    public function destroy(int $id)
+    public function destroy(Category $category)
     {
-        $category = Category::findOrFail($id);
-
         $category->delete();
 
         return response()->json(['message' => 'Category deleted']);

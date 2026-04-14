@@ -300,16 +300,16 @@
                 }
             }
         },
-        "/api/categories/{id}": {
+        "/api/categories/{category}": {
             "get": {
                 "tags": [
                     "Categories"
                 ],
                 "summary": "Get a category by ID",
-                "operationId": "c68e76d323c008827a9e47398b1583de",
+                "operationId": "e92579e78391b6199e78c2a091dbea0a",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "category",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -331,10 +331,10 @@
                     "Categories"
                 ],
                 "summary": "Update a category",
-                "operationId": "0e686b2748211cc688333ed705dc111f",
+                "operationId": "02aa39951e67916277e28086f85909c8",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "category",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -376,10 +376,10 @@
                     "Categories"
                 ],
                 "summary": "Delete a category",
-                "operationId": "4c12e22a7f8c617bd83bfa1fdc05428d",
+                "operationId": "d9ecd5c4a74c4d75339251863eedc08c",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "category",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -393,6 +393,189 @@
                     },
                     "404": {
                         "description": "Category not found"
+                    }
+                }
+            }
+        },
+        "/api/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "List all comments",
+                "operationId": "0406f270b674fae17bf23b4206a3004f",
+                "responses": {
+                    "200": {
+                        "description": "List of comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "ticket_id": {
+                                                "type": "integer"
+                                            },
+                                            "user_id": {
+                                                "type": "integer"
+                                            },
+                                            "comment": {
+                                                "type": "string"
+                                            },
+                                            "is_internal": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create a new comment",
+                "operationId": "300619a0a4003920aafe960e45688102",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ticket_id",
+                                    "user_id",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "ticket_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Comment content"
+                                    },
+                                    "is_internal": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/comments/{comment}": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get a comment by ID",
+                "operationId": "df604464ebd8be1727bb39c2711e2f03",
+                "parameters": [
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment found"
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Update a comment",
+                "operationId": "11551b83dcd65f7f079adf59f8c0348e",
+                "parameters": [
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "comment": {
+                                        "type": "string"
+                                    },
+                                    "is_internal": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment updated"
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Delete a comment",
+                "operationId": "e2e2b84a31c09628af8301e2ab9b209c",
+                "parameters": [
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment deleted"
+                    },
+                    "404": {
+                        "description": "Comment not found"
                     }
                 }
             }
@@ -496,11 +679,11 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "assigned_to": {
+                                    "created_by": {
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "created_by": {
+                                    "assigned_to": {
                                         "type": "integer",
                                         "example": 1
                                     }
@@ -520,16 +703,16 @@
                 }
             }
         },
-        "/api/tickets/{id}": {
+        "/api/tickets/{ticket}": {
             "get": {
                 "tags": [
                     "Tickets"
                 ],
                 "summary": "Get a ticket by ID",
-                "operationId": "62091a82e5103c19191c4c1ebd30ec6f",
+                "operationId": "653dfec809dc77c94527ffba9c1a6a42",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "ticket",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -551,10 +734,10 @@
                     "Tickets"
                 ],
                 "summary": "Update a ticket",
-                "operationId": "1010dcd7a1f352766df66431f1df4745",
+                "operationId": "32c4911fd210af747ca91977ce7bde92",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "ticket",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -611,10 +794,10 @@
                     "Tickets"
                 ],
                 "summary": "Delete a ticket",
-                "operationId": "c37b65ae6ff3ffa8c9e0c14ea4d6a9f7",
+                "operationId": "bb7be4d54b9a05e0df84e30a5c97f18a",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "ticket",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -641,6 +824,10 @@
         {
             "name": "Categories",
             "description": "Categories"
+        },
+        {
+            "name": "Comments",
+            "description": "Comments"
         },
         {
             "name": "Tickets",
