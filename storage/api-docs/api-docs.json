@@ -443,6 +443,16 @@
                 ],
                 "summary": "Create a new comment",
                 "operationId": "300619a0a4003920aafe960e45688102",
+                "parameters": [
+                    {
+                        "name": "ticket_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -450,25 +460,12 @@
                             "schema": {
                                 "required": [
                                     "ticket_id",
-                                    "user_id",
                                     "comment"
                                 ],
                                 "properties": {
-                                    "ticket_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
                                     "comment": {
                                         "type": "string",
                                         "example": "Comment content"
-                                    },
-                                    "is_internal": {
-                                        "type": "boolean",
-                                        "example": false
                                     }
                                 },
                                 "type": "object"
@@ -479,6 +476,9 @@
                 "responses": {
                     "201": {
                         "description": "Comment created"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "422": {
                         "description": "Validation error"
@@ -535,9 +535,6 @@
                                 "properties": {
                                     "comment": {
                                         "type": "string"
-                                    },
-                                    "is_internal": {
-                                        "type": "boolean"
                                     }
                                 },
                                 "type": "object"
@@ -576,6 +573,55 @@
                     },
                     "404": {
                         "description": "Comment not found"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/internal-comments": {
+            "patch": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create a new Internal comment (Admin, Agent only)",
+                "operationId": "756105a23f21b160c1d642eb93d9d041",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Comment content"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }

@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use OpenApi\Attributes as OA;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\Ticket;
 
 class CommentController extends Controller
 {
+    use AuthorizesRequests;
+
     #[OA\Get(
         path: '/api/comments',
         summary: 'List all comments',
@@ -28,48 +32,64 @@ class CommentController extends Controller
             )
         ]
     )]
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(
-            Comment::with(['ticket', 'user'])->get()
-        );
+        $this->authorize('viewAny', Comment::class);
+
+        $user = $request->user();
+
+        $query = Comment::with(['ticket', 'user']);
+
+        if ($user->hasRole('admin')) {
+            return response()->json($query->get());
+        }
+
+        $query->where('user_id', $user->id);
+
+        return response()->json($query->get());
     }
 
     #[OA\Post(
         path: '/api/comments',
         summary: 'Create a new comment',
         tags: ['Comments'],
+        parameters: [
+            new OA\Parameter(name: 'ticket_id', in: 'query', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['ticket_id', 'user_id', 'comment'],
+                required: ['ticket_id', 'comment'],
                 properties: [
-                    new OA\Property(property: 'ticket_id', type: 'integer', example: 1),
-                    new OA\Property(property: 'user_id', type: 'integer', example: 1),
                     new OA\Property(property: 'comment', type: 'string', example: 'Comment content'),
-                    new OA\Property(property: 'is_internal', type: 'boolean', example: false),
                 ]
             )
         ),
         responses: [
             new OA\Response(response: 201, description: 'Comment created'),
+            new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
     public function store(Request $request)
     {
+        $user = $request->user();
+
         $validated = $request->validate([
             'ticket_id'   => 'required|exists:tickets,id',
-            'user_id'     => 'required|exists:users,id',
             'comment'     => 'required|string',
             'is_internal' => 'boolean',
         ]);
 
+        $ticket = Ticket::findOrFail($validated['ticket_id']);
+
+        $this->authorize('create', [Comment::class, $ticket]);
+
         $comment = Comment::create([
             'ticket_id'   => $validated['ticket_id'],
-            'user_id'     => $validated['user_id'],
+            'user_id'     => $user->id,
             'comment'     => $validated['comment'],
-            'is_internal' => $validated['is_internal'] ?? false,
+            'is_internal' => false,
         ]);
 
         return response()->json($comment->load(['ticket', 'user']), 201);
@@ -90,7 +110,8 @@ class CommentController extends Controller
 
     public function show(Comment $comment)
     {
-        return response()->json($comment->load(['ticket', 'user']));
+        $this->authorize('view', $comment);
+        return response()->json($comment->load(['ticket', 'user']), 200);
     }
 
     #[OA\Put(
@@ -104,7 +125,6 @@ class CommentController extends Controller
             content: new OA\JsonContent(
                 properties: [
                     new OA\Property(property: 'comment', type: 'string'),
-                    new OA\Property(property: 'is_internal', type: 'boolean'),
                 ]
             )
         ),
@@ -115,9 +135,10 @@ class CommentController extends Controller
     )]
     public function update(Request $request, Comment $comment)
     {
+        $this->authorize('update', $comment);
+
         $validated = $request->validate([
             'comment'     => 'sometimes|string',
-            'is_internal' => 'boolean',
         ]);
 
         $comment->update($validated);
@@ -139,10 +160,55 @@ class CommentController extends Controller
     )]
     public function destroy(Comment $comment)
     {
+        $this->authorize('delete', $comment);
+
         $comment->delete();
 
         return response()->json([
             'message' => 'Comment deleted'
         ]);
+    }
+
+    #[OA\Patch(
+        path: '/api/tickets/{ticket}/internal-comments',
+        summary: 'Create a new Internal comment (Admin, Agent only)',
+        tags: ['Comments'],
+        parameters: [
+            new OA\Parameter(name: 'ticket', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['comment'],
+                properties: [
+                    new OA\Property(property: 'comment', type: 'string', example: 'Comment content'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Comment created'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+
+    public function internal_comments(Request $request, Ticket $ticket)
+    {
+        $user = $request->user();
+
+        $this->authorize('internal_comments', $ticket);
+
+        $validated = $request->validate([
+            'comment' => 'required|string',
+        ]);
+
+        $comment = Comment::create([
+            'ticket_id'   => $ticket->id,
+            'user_id'     => $user->id,
+            'comment'     => $validated['comment'],
+            'is_internal' => true,
+        ]);
+
+        return response()->json($comment, 201);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Ticket;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TicketPolicy
 {
@@ -14,11 +13,6 @@ class TicketPolicy
     private function isAssignedToUser(User $user, Ticket $ticket): bool
     {
         return $ticket->assigned_to === $user->id;
-    }
-
-    private function isFinalState(Ticket $ticket): bool
-    {
-        return in_array($ticket->status, ['resolved', 'closed']);
     }
 
     public function viewAny(User $user): bool
@@ -49,7 +43,7 @@ class TicketPolicy
      */
     public function update(User $user, Ticket $ticket): bool
     {
-        if ($this->isFinalState($ticket)) {
+        if ($ticket->isFinalState()) {
             return false;
         }
 
@@ -66,18 +60,30 @@ class TicketPolicy
         return $user->hasRole('admin');
     }
 
-    public function assign(User $user, Ticket $ticket): bool
+    public function assign(User $user, Ticket $ticket, ?User $targetUser = null): bool
     {
-        if ($this->isFinalState($ticket)) {
+        if ($ticket->isFinalState()) {
             return false;
         }
 
-        return $user->hasRole('admin') || $user->hasRole('agent');
+        if ($user->hasRole('agent')) {
+            // Agent só pode atribuir a si mesmo
+            return $targetUser && $targetUser->id === $user->id;
+        }
+
+        if ($user->hasRole('admin')) {
+            // Admin só pode atribuir a agents ou a si mesmo
+            return $targetUser && (
+                $targetUser->hasRole('agent') || $targetUser->id === $user->id
+            );
+        }
+
+        return false;
     }
 
     public function updateStatus(User $user, Ticket $ticket): bool
     {
-        if ($this->isFinalState($ticket)) {
+        if ($ticket->isFinalState()) {
             return false;
         }
 
@@ -87,11 +93,28 @@ class TicketPolicy
 
     public function updatePriority(User $user, Ticket $ticket): bool
     {
-        if ($this->isFinalState($ticket)) {
+        if ($ticket->isFinalState()) {
             return false;
         }
 
         return $user->hasRole('admin')
             || ($user->hasRole('agent') && $this->isAssignedToUser($user, $ticket));
+    }
+
+    public function internal_comments(User $user, Ticket $ticket): bool
+    {
+        if ($ticket->isFinalState()) {
+            return false;
+        }
+
+        if (! $user->hasAnyRole(['admin', 'agent'])) {
+            return false;
+        }
+
+        if ($user->hasRole('agent')) {
+            return $ticket->assigned_to === $user->id;
+        }
+
+        return true;
     }
 }

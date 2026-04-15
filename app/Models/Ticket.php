@@ -27,6 +27,11 @@ class Ticket extends Model
     |-----------------------------
     */
 
+    public function isFinalState(): bool
+    {
+        return in_array($this->status, ['resolved', 'closed']);
+    }
+
     // quem criou o ticket
     public function creator()
     {

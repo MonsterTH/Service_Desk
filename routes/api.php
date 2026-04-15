@@ -16,12 +16,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('tickets', TicketController::class);
 
-    Route::patch('tickets/{ticket}/assign', [TicketController::class, 'assign']);
+    Route::patch('tickets/{ticket}/assign', [TicketController::class, 'assign'])
+        ->middleware('role:admin|agent');
     Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::patch('tickets/{ticket}/priority', [TicketController::class, 'updatePriority']);
 
     Route::apiResource('comments', CommentController::class);
-
+    Route::patch(
+        'tickets/{ticket}/internal-comments',
+        [CommentController::class, 'internal_comments']
+    )
+    ->middleware('role:admin|agent');
 
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('categories/{category}', [CategoryController::class, 'show']);

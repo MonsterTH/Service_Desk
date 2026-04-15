@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use App\Models\User;
 use OpenApi\Attributes as OA;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class TicketController extends Controller
@@ -39,11 +40,11 @@ class TicketController extends Controller
             )
         ]
     )]
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Ticket::class);
 
-        $user = Auth::user();
+        $user = $request->user();
 
         $query = Ticket::with(['category', 'creator', 'assignee'])
             ->whereNotIn('status', ['resolved', 'closed']);
@@ -91,7 +92,6 @@ class TicketController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'priority'    => 'nullable|in:low,medium,high,urgent',
             'category_id' => 'nullable|exists:categories,id',
         ]);
 
@@ -99,7 +99,7 @@ class TicketController extends Controller
             'title'       => $validated['title'],
             'description' => $validated['description'] ?? null,
             'status'      => 'open',
-            'priority'    => $validated['priority'] ?? 'low',
+            'priority'    => 'low',
             'category_id' => $validated['category_id'] ?? null,
             'assigned_to' => null,
             'created_by'  => $request->user()->id,
@@ -123,6 +123,7 @@ class TicketController extends Controller
     public function show(Ticket $ticket)
     {
         $this->authorize('view', $ticket);
+
         return response()->json($ticket);
     }
 
@@ -175,6 +176,7 @@ class TicketController extends Controller
     public function destroy(Ticket $ticket)
     {
         $this->authorize('delete', $ticket);
+
         $ticket->delete();
 
         return response()->json([
@@ -216,20 +218,16 @@ class TicketController extends Controller
 
     public function assign(Request $request, Ticket $ticket)
     {
-        $this->authorize('assign', $ticket);
-
         $validated = $request->validate([
             'assigned_to' => 'required|exists:users,id',
         ]);
 
-        $user = auth()->user();
+        $targetUser = User::findOrFail($validated['assigned_to']);
 
-        if ($user->hasRole('agent') && $validated['assigned_to'] != $user->id) {
-            abort(403, 'Agents can only assign tickets to themselves.');
-        }
+        $this->authorize('assign', [$ticket, $targetUser]);
 
         $ticket->update([
-            'assigned_to' => $validated['assigned_to'],
+            'assigned_to' => $targetUser->id,
         ]);
 
         return response()->json($ticket);

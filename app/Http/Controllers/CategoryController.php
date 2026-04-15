@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use OpenApi\Attributes as OA;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class CategoryController extends Controller
 {
+    use AuthorizesRequests;
+
     #[OA\Get(
         path: '/api/categories',
         summary: 'List all categories',
@@ -28,6 +31,8 @@ class CategoryController extends Controller
     )]
     public function index()
     {
+        $this->authorize('viewAny', Category::class);
+
         return response()->json(Category::all());
     }
 
@@ -54,6 +59,8 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Category::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -83,6 +90,8 @@ class CategoryController extends Controller
     )]
     public function show(Category $category)
     {
+        $this->authorize('view', Category::class);
+
         return response()->json($category);
     }
 
@@ -109,6 +118,8 @@ class CategoryController extends Controller
     )]
     public function update(Request $request, Category $category)
     {
+        $this->authorize('update', Category::class);
+
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
@@ -139,6 +150,8 @@ class CategoryController extends Controller
     )]
     public function destroy(Category $category)
     {
+        $this->authorize('delete', Category::class);
+
         $category->delete();
 
         return response()->json(['message' => 'Category deleted']);
