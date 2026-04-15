@@ -47,10 +47,10 @@ class TicketController extends Controller
         $user = $request->user();
 
         $query = Ticket::with(['category', 'creator', 'assignee'])
-            ->whereNotIn('status', ['resolved', 'closed'])->get();
+            ->whereNotIn('status', ['resolved', 'closed']);
 
         if ($user->hasRole('admin')) {
-            return response()->json($query->latest()->paginate(20));
+            return $query->latest()->paginate(20);
         }
 
         if ($user->hasRole('agent')) {
