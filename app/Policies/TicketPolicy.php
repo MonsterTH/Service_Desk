@@ -25,6 +25,10 @@ class TicketPolicy
      */
     public function view(User $user, Ticket $ticket): bool
     {
+        if ($ticket->trashed()) {
+            return $user->hasRole('admin');
+        }
+
         return $user->hasRole('admin')
             || ($user->hasRole('agent') && $ticket->assigned_to === $user->id)
             || $ticket->created_by === $user->id;
