@@ -7,6 +7,8 @@ use App\Models\Ticket;
 use App\Models\User;
 use OpenApi\Attributes as OA;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Http\Resources\TicketResource;
+
 class TicketController extends Controller
 {
     use AuthorizesRequests;
@@ -24,16 +26,7 @@ class TicketController extends Controller
                         new OA\Property(
                             property: 'data',
                             type: 'array',
-                            items: new OA\Items(
-                                type: 'object',
-                                properties: [
-                                    new OA\Property(property: 'id', type: 'integer'),
-                                    new OA\Property(property: 'title', type: 'string'),
-                                    new OA\Property(property: 'description', type: 'string'),
-                                    new OA\Property(property: 'status', type: 'string'),
-                                    new OA\Property(property: 'priority', type: 'string'),
-                                ]
-                            )
+                            items: new OA\Items(ref: '#/components/schemas/Ticket')
                         )
                     ]
                 )
@@ -50,7 +43,7 @@ class TicketController extends Controller
             ->whereNotIn('status', ['resolved', 'closed']);
 
         if ($user->hasRole('admin')) {
-            return $query->latest()->paginate(20);
+            return TicketResource::collection($query->latest()->paginate(20));
         }
 
         if ($user->hasRole('agent')) {
@@ -62,7 +55,7 @@ class TicketController extends Controller
             $query->where('created_by', $user->id);
         }
 
-        return response()->json($query->latest()->paginate(20));
+        return TicketResource::collection($query->latest()->paginate(20));
     }
 
     #[OA\Post(
@@ -72,7 +65,7 @@ class TicketController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['title', 'priority'],
+                required: ['title'],
                 properties: [
                     new OA\Property(property: 'title', type: 'string', example: 'My ticket'),
                     new OA\Property(property: 'description', type: 'string'),
@@ -81,7 +74,17 @@ class TicketController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 201, description: 'Ticket created'),
+            new OA\Response(
+                response: 201,
+                description: 'Ticket created',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Ticket'
+                        )
+                    ]
+                )),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
@@ -105,7 +108,7 @@ class TicketController extends Controller
             'created_by'  => $request->user()->id,
         ]);
 
-        return response()->json($ticket, 201);
+        return new TicketResource($ticket->load(['category', 'creator', 'assignee']));
     }
 
     #[OA\Get(
@@ -116,7 +119,18 @@ class TicketController extends Controller
             new OA\Parameter(name: 'ticket', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Ticket found'),
+            new OA\Response(
+                    response: 200,
+                    description: 'Ticket found',
+                    content: new OA\JsonContent(
+                        properties: [
+                            new OA\Property(
+                                property: 'data',
+                                ref: '#/components/schemas/Ticket'
+                            )
+                        ]
+                    )
+                ),
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
@@ -124,7 +138,7 @@ class TicketController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        return response()->json($ticket);
+        return new TicketResource($ticket);
     }
 
     #[OA\Put(
@@ -143,7 +157,18 @@ class TicketController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Ticket updated'),
+            new OA\Response(
+                    response: 200,
+                    description: 'Ticket updated',
+                    content: new OA\JsonContent(
+                        properties: [
+                            new OA\Property(
+                                property: 'data',
+                                ref: '#/components/schemas/Ticket'
+                            )
+                        ]
+                    )
+                ),
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
@@ -158,7 +183,7 @@ class TicketController extends Controller
 
         $ticket->update($validated);
 
-        return response()->json($ticket);
+        return new TicketResource($ticket);
     }
 
     #[OA\Delete(
@@ -210,7 +235,18 @@ class TicketController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Ticket assigned successfully'),
+            new OA\Response(
+                        response: 200,
+                        description: 'Ticket assigned successfully',
+                        content: new OA\JsonContent(
+                            properties: [
+                                new OA\Property(
+                                    property: 'data',
+                                    ref: '#/components/schemas/Ticket'
+                                )
+                            ]
+                        )
+                    ),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
@@ -230,7 +266,7 @@ class TicketController extends Controller
             'assigned_to' => $targetUser->id,
         ]);
 
-        return response()->json($ticket);
+        return new TicketResource($ticket);
     }
 
     #[OA\Patch(
@@ -259,7 +295,18 @@ class TicketController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Status updated successfully'),
+            new OA\Response(
+                    response: 200,
+                    description: 'Status updated successfully',
+                    content: new OA\JsonContent(
+                        properties: [
+                            new OA\Property(
+                                property: 'data',
+                                ref: '#/components/schemas/Ticket'
+                            )
+                        ]
+                    )
+                ),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
@@ -277,7 +324,7 @@ class TicketController extends Controller
             'status' => $validated['status'],
         ]);
 
-        return response()->json($ticket);
+        return new TicketResource($ticket);
     }
 
     #[OA\Patch(
@@ -306,7 +353,18 @@ class TicketController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Priority updated'),
+            new OA\Response(
+                response: 200,
+                description: 'Priority updated',
+                content: new OA\JsonContent(
+                        properties: [
+                            new OA\Property(
+                                property: 'data',
+                                ref: '#/components/schemas/Ticket'
+                            )
+                        ]
+                    )
+                ),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
@@ -325,9 +383,6 @@ class TicketController extends Controller
             'priority' => $validated['priority'],
         ]);
 
-        return response()->json([
-            'message' => 'Priority updated successfully',
-            'ticket' => $ticket
-        ]);
+        return new TicketResource($ticket);
     }
 }

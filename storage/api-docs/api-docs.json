@@ -780,24 +780,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "title": {
-                                                        "type": "string"
-                                                    },
-                                                    "description": {
-                                                        "type": "string"
-                                                    },
-                                                    "status": {
-                                                        "type": "string"
-                                                    },
-                                                    "priority": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Ticket"
                                             }
                                         }
                                     },
@@ -820,8 +803,7 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "title",
-                                    "priority"
+                                    "title"
                                 ],
                                 "properties": {
                                     "title": {
@@ -843,7 +825,19 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Ticket created"
+                        "description": "Ticket created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation error"
@@ -870,7 +864,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Ticket found"
+                        "description": "Ticket found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Ticket not found"
@@ -912,7 +918,19 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Ticket updated"
+                        "description": "Ticket updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Ticket not found"
@@ -983,7 +1001,19 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Ticket assigned successfully"
+                        "description": "Ticket assigned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "403": {
                         "description": "Forbidden"
@@ -1037,7 +1067,19 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Status updated successfully"
+                        "description": "Status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "403": {
                         "description": "Forbidden"
@@ -1091,7 +1133,19 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Priority updated"
+                        "description": "Priority updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Ticket"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "403": {
                         "description": "Forbidden"
@@ -1238,6 +1292,48 @@
                     "created_by": {
                         "type": "integer",
                         "example": 1
+                    },
+                    "category": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Hardware"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "creator": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "John Doe"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "assignee": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 2
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Support Agent"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
                     }
                 },
                 "type": "object"
