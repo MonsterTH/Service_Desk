@@ -457,43 +457,44 @@
                 }
             }
         },
-        "/api/comments": {
+        "/api/tickets/{ticket}/comments": {
             "get": {
                 "tags": [
                     "Comments"
                 ],
-                "summary": "List all comments",
-                "operationId": "0406f270b674fae17bf23b4206a3004f",
+                "summary": "List all comments of a ticket",
+                "operationId": "d7085f75fb6279e4285af00cf607141b",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of comments",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "ticket_id": {
-                                                "type": "integer"
-                                            },
-                                            "user_id": {
-                                                "type": "integer"
-                                            },
-                                            "comment": {
-                                                "type": "string"
-                                            },
-                                            "is_internal": {
-                                                "type": "boolean"
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Comment"
                                             }
-                                        },
-                                        "type": "object"
-                                    }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 }
             },
@@ -501,149 +502,8 @@
                 "tags": [
                     "Comments"
                 ],
-                "summary": "Create a new comment",
-                "operationId": "300619a0a4003920aafe960e45688102",
-                "parameters": [
-                    {
-                        "name": "ticket_id",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "ticket_id",
-                                    "comment"
-                                ],
-                                "properties": {
-                                    "comment": {
-                                        "type": "string",
-                                        "example": "Comment content"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Comment created"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "422": {
-                        "description": "Validation error"
-                    }
-                }
-            }
-        },
-        "/api/comments/{comment}": {
-            "get": {
-                "tags": [
-                    "Comments"
-                ],
-                "summary": "Get a comment by ID",
-                "operationId": "df604464ebd8be1727bb39c2711e2f03",
-                "parameters": [
-                    {
-                        "name": "comment",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Comment found"
-                    },
-                    "404": {
-                        "description": "Comment not found"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Comments"
-                ],
-                "summary": "Update a comment",
-                "operationId": "11551b83dcd65f7f079adf59f8c0348e",
-                "parameters": [
-                    {
-                        "name": "comment",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "comment": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Comment updated"
-                    },
-                    "404": {
-                        "description": "Comment not found"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Comments"
-                ],
-                "summary": "Delete a comment",
-                "operationId": "e2e2b84a31c09628af8301e2ab9b209c",
-                "parameters": [
-                    {
-                        "name": "comment",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Comment deleted"
-                    },
-                    "404": {
-                        "description": "Comment not found"
-                    }
-                }
-            }
-        },
-        "/api/tickets/{ticket}/internal-comments": {
-            "patch": {
-                "tags": [
-                    "Comments"
-                ],
-                "summary": "Create a new Internal comment (Admin, Agent only)",
-                "operationId": "756105a23f21b160c1d642eb93d9d041",
+                "summary": "Create a comment for a ticket",
+                "operationId": "0f3714f4a88d0a381f703f24cbd00d7c",
                 "parameters": [
                     {
                         "name": "ticket",
@@ -675,7 +535,224 @@
                 },
                 "responses": {
                     "201": {
+                        "description": "Comment created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Comment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/comments/{comment}": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get a comment by ID",
+                "operationId": "3dd930f84b631142ca87522ee16aee33",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Comment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Update a comment",
+                "operationId": "0f1d92d68b7ea108917ffe709a116085",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Updated comment"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Comment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Delete a comment",
+                "operationId": "7a4d64d5d3f7fa6081b4832c3294ef75",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "comment",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment deleted"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Comment not found"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/internal-comments": {
+            "patch": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create internal comment (Admin/Agent only)",
+                "operationId": "756105a23f21b160c1d642eb93d9d041",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Internal comment"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
                         "description": "Comment created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "403": {
                         "description": "Forbidden"
@@ -1049,6 +1126,57 @@
                 },
                 "type": "object"
             },
+            "Comment": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ticket_id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "This is a comment"
+                    },
+                    "is_internal": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "ticket": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 2
+                            },
+                            "title": {
+                                "type": "string",
+                                "example": "My ticket"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "user": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 2
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Support Agent"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "Role": {
                 "properties": {
                     "id": {
@@ -1058,6 +1186,58 @@
                     "name": {
                         "type": "string",
                         "example": "admin"
+                    }
+                },
+                "type": "object"
+            },
+            "Ticket": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "My ticket"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Ticket description",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "open",
+                        "enum": [
+                            "open",
+                            "in_progress",
+                            "resolved",
+                            "closed"
+                        ]
+                    },
+                    "priority": {
+                        "type": "string",
+                        "example": "low",
+                        "enum": [
+                            "low",
+                            "medium",
+                            "high",
+                            "urgent"
+                        ]
+                    },
+                    "category_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "assigned_to": {
+                        "type": "integer",
+                        "example": 2,
+                        "nullable": true
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "type": "object"

@@ -9,9 +9,21 @@ use Illuminate\Auth\Access\Response;
 
 class CommentPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, Ticket $ticket): bool
     {
-        return true;
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        if ($user->hasRole('agent')) {
+            return $ticket->assigned_to === $user->id;
+        }
+
+        if ($user->hasRole('employee')) {
+            return $ticket->created_by === $user->id;
+        }
+
+        return false;
     }
 
     public function view(User $user, Comment $comment): bool

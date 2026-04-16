@@ -21,7 +21,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::patch('tickets/{ticket}/priority', [TicketController::class, 'updatePriority']);
 
-    Route::apiResource('comments', CommentController::class);
+    Route::get('tickets/{ticket}/comments', [CommentController::class, 'index']);
+    Route::post('tickets/{ticket}/comments', [CommentController::class, 'store']);
+
+    Route::get('tickets/{ticket}/comments/{comment}', [CommentController::class, 'show']);
+    Route::put('tickets/{ticket}/comments/{comment}', [CommentController::class, 'update']);
+    Route::delete('tickets/{ticket}/comments/{comment}', [CommentController::class, 'destroy']);
+
     Route::patch(
         'tickets/{ticket}/internal-comments',
         [CommentController::class, 'internal_comments']
