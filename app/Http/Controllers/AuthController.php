@@ -64,7 +64,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->only(['id', 'name', 'email']),
             'token' => $token
         ], 201);
     }
@@ -124,7 +124,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->only(['id', 'name', 'email']),
             'token' => $token
         ]);
     }
@@ -182,6 +182,17 @@ class AuthController extends Controller
                         new OA\Property(
                             property: 'email',
                             type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'roles',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer'),
+                                    new OA\Property(property: 'name', type: 'string'),
+                                ]
+                            )
                         )
                     ]
                 )
@@ -196,6 +207,13 @@ class AuthController extends Controller
     {
         $user = $request->user()->load('roles');
 
-        return response()->json($user);
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles
+                ->map->only(['id', 'name'])
+                ->values(),
+        ]);
     }
 }
