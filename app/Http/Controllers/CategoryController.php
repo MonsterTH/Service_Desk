@@ -16,6 +16,14 @@ class CategoryController extends Controller
         path: '/api/categories',
         summary: 'List all categories',
         tags: ['Categories'],
+        parameters: [
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
+        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -37,7 +45,7 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        return CategoryResource::collection(Category::latest()->paginate(20));
+        return CategoryResource::collection(Category::paginate(20));
     }
 
     #[OA\Post(

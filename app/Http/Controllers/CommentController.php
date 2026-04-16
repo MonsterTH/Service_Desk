@@ -23,7 +23,13 @@ class CommentController extends Controller
                 in: 'path',
                 required: true,
                 schema: new OA\Schema(type: 'integer')
-            )
+            ),
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', example: 1)
+            ),
         ],
         responses: [
             new OA\Response(
@@ -53,7 +59,7 @@ class CommentController extends Controller
             $query->where('is_internal', false);
         }
 
-        return CommentResource::collection($query->latest()->paginate(20));
+        return CommentResource::collection($query->paginate(20));
     }
 
     #[OA\Post(
