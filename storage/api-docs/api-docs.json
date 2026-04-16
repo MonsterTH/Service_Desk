@@ -31,13 +31,16 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "John Doe"
                                     },
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "john@example.com"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "password123"
                                     }
                                 },
                                 "type": "object"
@@ -53,21 +56,36 @@
                                 "schema": {
                                     "properties": {
                                         "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "email": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/User"
                                         },
                                         "token": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "1|abc123token"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -96,10 +114,12 @@
                                 ],
                                 "properties": {
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "john@example.com"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "password123"
                                     }
                                 },
                                 "type": "object"
@@ -115,21 +135,11 @@
                                 "schema": {
                                     "properties": {
                                         "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "email": {
-                                                    "type": "string"
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/User"
                                         },
                                         "token": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "1|abc123token"
                                         }
                                     },
                                     "type": "object"
@@ -187,7 +197,7 @@
                 "operationId": "9d9bc556f927575aa492a88c28fe5908",
                 "responses": {
                     "200": {
-                        "description": "User data",
+                        "description": "Authenticated user",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -204,15 +214,7 @@
                                         "roles": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "name": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Role"
                                             }
                                         }
                                     },
@@ -980,6 +982,47 @@
             }
         }
     },
+    "components": {
+        "schemas": {
+            "Role": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "admin"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john@example.com"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
     "tags": [
         {
             "name": "Auth",
@@ -998,15 +1041,6 @@
             "description": "Tickets"
         }
     ],
-    "components": {
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            }
-        }
-    },
     "security": [
         {
             "bearerAuth": []

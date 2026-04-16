@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use OpenApi\Attributes as OA;
+use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
@@ -18,9 +19,9 @@ class AuthController extends Controller
             content: new OA\JsonContent(
                 required: ['name', 'email', 'password'],
                 properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                    new OA\Property(property: 'email', type: 'string'),
-                    new OA\Property(property: 'password', type: 'string'),
+                    new OA\Property(property: 'name', type: 'string', example: 'John Doe'),
+                    new OA\Property(property: 'email', type: 'string', example: 'john@example.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password123'),
                 ]
             )
         ),
@@ -32,17 +33,37 @@ class AuthController extends Controller
                     properties: [
                         new OA\Property(
                             property: 'user',
-                            type: 'object',
-                            properties: [
-                                new OA\Property(property: 'id', type: 'integer'),
-                                new OA\Property(property: 'name', type: 'string'),
-                                new OA\Property(property: 'email', type: 'string'),
-                            ]
+                            ref: '#/components/schemas/User'
                         ),
-                        new OA\Property(property: 'token', type: 'string')
+                        new OA\Property(
+                            property: 'token',
+                            type: 'string',
+                            example: '1|abc123token'
+                        ),
                     ]
                 )
-            )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'message',
+                            type: 'string',
+                            example: 'Validation error'
+                        ),
+                        new OA\Property(
+                            property: 'errors',
+                            type: 'object',
+                            additionalProperties: new OA\AdditionalProperties(
+                                type: 'array',
+                                items: new OA\Items(type: 'string')
+                            )
+                        )
+                    ]
+                )
+            ),
         ]
     )]
     public function register(Request $request)
@@ -64,7 +85,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user->only(['id', 'name', 'email']),
+            'user' => new UserResource($user),
             'token' => $token
         ], 201);
     }
@@ -78,8 +99,8 @@ class AuthController extends Controller
             content: new OA\JsonContent(
                 required: ['email', 'password'],
                 properties: [
-                    new OA\Property(property: 'email', type: 'string'),
-                    new OA\Property(property: 'password', type: 'string'),
+                    new OA\Property(property: 'email', type: 'string', example: 'john@example.com'),
+                    new OA\Property(property: 'password', type: 'string', example: 'password123'),
                 ]
             )
         ),
@@ -91,14 +112,13 @@ class AuthController extends Controller
                     properties: [
                         new OA\Property(
                             property: 'user',
-                            type: 'object',
-                            properties: [
-                                new OA\Property(property: 'id', type: 'integer'),
-                                new OA\Property(property: 'name', type: 'string'),
-                                new OA\Property(property: 'email', type: 'string'),
-                            ]
+                            ref: '#/components/schemas/User'
                         ),
-                        new OA\Property(property: 'token', type: 'string')
+                        new OA\Property(
+                            property: 'token',
+                            type: 'string',
+                            example: '1|abc123token'
+                        ),
                     ]
                 )
             ),
@@ -124,7 +144,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user->only(['id', 'name', 'email']),
+            'user' => new UserResource($user),
             'token' => $token
         ]);
     }
@@ -140,7 +160,11 @@ class AuthController extends Controller
                 description: 'User logged out successfully',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'message', type: 'string', example: 'Logged out successfully')
+                        new OA\Property(
+                            property: 'message',
+                            type: 'string',
+                            example: 'Logged out successfully'
+                        )
                     ]
                 )
             ),
@@ -150,7 +174,6 @@ class AuthController extends Controller
             )
         ]
     )]
-
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -168,32 +191,20 @@ class AuthController extends Controller
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'User data',
+                description: 'Authenticated user',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(
-                            property: 'id',
-                            type: 'integer'
-                        ),
-                        new OA\Property(
-                            property: 'name',
-                            type: 'string'
-                        ),
-                        new OA\Property(
-                            property: 'email',
-                            type: 'string'
-                        ),
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'name', type: 'string'),
+                        new OA\Property(property: 'email', type: 'string'),
+
                         new OA\Property(
                             property: 'roles',
                             type: 'array',
                             items: new OA\Items(
-                                type: 'object',
-                                properties: [
-                                    new OA\Property(property: 'id', type: 'integer'),
-                                    new OA\Property(property: 'name', type: 'string'),
-                                ]
+                                ref: '#/components/schemas/Role'
                             )
-                        )
+                        ),
                     ]
                 )
             ),
@@ -207,13 +218,6 @@ class AuthController extends Controller
     {
         $user = $request->user()->load('roles');
 
-        return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'roles' => $user->roles
-                ->map->only(['id', 'name'])
-                ->values(),
-        ]);
+        return new UserResource($user);
     }
 }
