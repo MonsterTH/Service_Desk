@@ -37,7 +37,7 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        return CategoryResource::collection(Category::all());
+        return CategoryResource::collection(Category::latest()->paginate(20));
     }
 
     #[OA\Post(

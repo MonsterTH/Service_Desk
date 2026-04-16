@@ -53,7 +53,7 @@ class CommentController extends Controller
             $query->where('is_internal', false);
         }
 
-        return CommentResource::collection($query->get());
+        return CommentResource::collection($query->latest()->paginate(20));
     }
 
     #[OA\Post(
@@ -258,7 +258,7 @@ class CommentController extends Controller
         ]);
     }
 
-    #[OA\Patch(
+    #[OA\Post(
         path: '/api/tickets/{ticket}/internal-comments',
         summary: 'Create internal comment (Admin/Agent only)',
         tags: ['Comments'],
@@ -284,7 +284,18 @@ class CommentController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 201, description: 'Comment created'),
+            new OA\Response(
+                response: 201,
+                description: 'Comment created',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Comment'
+                        )
+                    ]
+                )
+            ),
             new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),

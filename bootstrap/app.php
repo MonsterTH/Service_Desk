@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -39,11 +40,27 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
+        // $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
+        //     if ($request->is('api/*')) {
+        //         return response()->json([
+        //             'message' => 'Resource not found'
+        //         ], 404);
+        //     }
+        // });
+
+        $exceptions->render(function (\Throwable $e, $request) {
+
             if ($request->is('api/*')) {
+
+                $status = $e instanceof HttpExceptionInterface
+                    ? $e->getStatusCode()
+                    : 500;
+
                 return response()->json([
-                    'message' => 'Resource not found'
-                ], 404);
+                    'message' => app()->hasDebugModeEnabled()
+                        ? $e->getMessage()
+                        : 'Server Error',
+                ], $status);
             }
         });
 

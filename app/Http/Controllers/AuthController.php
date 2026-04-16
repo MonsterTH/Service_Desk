@@ -66,6 +66,7 @@ class AuthController extends Controller
             ),
         ]
     )]
+
     public function register(Request $request)
     {
         $request->validate([
@@ -128,6 +129,7 @@ class AuthController extends Controller
             )
         ]
     )]
+
     public function login(Request $request)
     {
         $request->validate([
@@ -215,6 +217,7 @@ class AuthController extends Controller
             )
         ]
     )]
+
     public function me(Request $request)
     {
         $user = $request->user()->load('roles');

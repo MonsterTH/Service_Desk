@@ -712,12 +712,12 @@
             }
         },
         "/api/tickets/{ticket}/internal-comments": {
-            "patch": {
+            "post": {
                 "tags": [
                     "Comments"
                 ],
                 "summary": "Create internal comment (Admin/Agent only)",
-                "operationId": "756105a23f21b160c1d642eb93d9d041",
+                "operationId": "1681daa40e89d2447036b149ac3ae567",
                 "parameters": [
                     {
                         "name": "ticket",
@@ -749,7 +749,19 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Comment created"
+                        "description": "Comment created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Comment"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
