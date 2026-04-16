@@ -92,12 +92,12 @@ class CategoryController extends Controller
                 )
             ),
             new OA\Response(
-                response: 422,
-                description: 'Validation error'
-            ),
-            new OA\Response(
                 response: 401,
                 description: 'Unauthenticated'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error'
             )
         ]
     )]
@@ -145,12 +145,11 @@ class CategoryController extends Controller
                     ]
                 )
             ),
-            new OA\Response(response: 404, description: 'Category not found'),
-
             new OA\Response(
                 response: 401,
                 description: 'Unauthenticated'
-            )
+            ),
+            new OA\Response(response: 404, description: 'Category not found')
         ]
     )]
     public function show(Category $category)
@@ -209,16 +208,16 @@ class CategoryController extends Controller
                 )
             ),
             new OA\Response(
+                response: 401,
+                description: 'Unauthenticated'
+            ),
+            new OA\Response(
                 response: 404,
                 description: 'Category not found'
             ),
             new OA\Response(
                 response: 422,
                 description: 'Validation error'
-            ),
-            new OA\Response(
-                response: 401,
-                description: 'Unauthenticated'
             )
         ]
     )]
@@ -251,11 +250,11 @@ class CategoryController extends Controller
         ],
         responses: [
             new OA\Response(response: 200, description: 'Category deleted'),
-            new OA\Response(response: 404, description: 'Category not found'),
             new OA\Response(
                 response: 401,
                 description: 'Unauthenticated'
-            )
+            ),
+            new OA\Response(response: 404, description: 'Category not found'),
         ]
     )]
     public function destroy(Category $category)

@@ -21,7 +21,7 @@ Sistema de gestão de tickets com comentários, autenticação e controlo de per
 ### 1. Clonar o projeto
 
 ```bash
-git clone https://github.com/teu-repo/service-desk.git
+git clone https://github.com/MonsterTH/Service_Desk.git
 cd service-desk
 ```
 ### 2. Subir os Containers

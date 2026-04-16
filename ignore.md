@@ -6,7 +6,7 @@ docker exec -it Service_Desk bash
 2. Models ligados OK 
 3. Controllers implementados OK
 4. API testada no Postman OK
-5. Auth + roles
-6. filtros + polish
+5. Auth + roles OK
+6. filtros + polish OK
 
 sudo chown -R $USER:$USER ~/Work/Proj1/Service_Desk <- Toda fez que um ficheiro tenha sido criada

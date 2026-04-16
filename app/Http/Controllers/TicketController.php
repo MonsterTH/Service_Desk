@@ -160,6 +160,7 @@ class TicketController extends Controller
                         )
                     ]
                 )),
+            new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
@@ -206,6 +207,7 @@ class TicketController extends Controller
                         ]
                     )
                 ),
+            new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
@@ -244,6 +246,7 @@ class TicketController extends Controller
                         ]
                     )
                 ),
+            new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
@@ -270,6 +273,8 @@ class TicketController extends Controller
         ],
         responses: [
             new OA\Response(response: 200, description: 'Ticket deleted'),
+            new OA\Response(response: 401, description: 'Unauthorized'),
+            new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 404, description: 'Ticket not found'),
         ]
     )]
@@ -322,6 +327,7 @@ class TicketController extends Controller
                             ]
                         )
                     ),
+            new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
@@ -382,6 +388,7 @@ class TicketController extends Controller
                         ]
                     )
                 ),
+            new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
@@ -440,6 +447,7 @@ class TicketController extends Controller
                         ]
                     )
                 ),
+            new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
