@@ -202,14 +202,8 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "email": {
-                                            "type": "string"
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
                                         },
                                         "roles": {
                                             "type": "array",
@@ -249,25 +243,14 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string"
-                                            },
-                                            "is_active": {
-                                                "type": "boolean"
-                                            }
-                                        },
-                                        "type": "object"
+                                        "$ref": "#/components/schemas/Category"
                                     }
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 }
             },
@@ -283,18 +266,16 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "description",
-                                    "is_active"
+                                    "name"
                                 ],
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "My category"
+                                        "example": "Electronics"
                                     },
                                     "description": {
                                         "type": "string",
-                                        "example": "Category description"
+                                        "example": "All electronic items"
                                     },
                                     "is_active": {
                                         "type": "boolean",
@@ -308,12 +289,32 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Category created"
+                        "description": "Category created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/categories/{category}": {
@@ -335,10 +336,25 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Category found"
+                        "description": "Category found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Category not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 }
             },
@@ -359,18 +375,25 @@
                     }
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "name"
+                                ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Electronics"
                                     },
                                     "description": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "All electronic items"
                                     },
                                     "is_active": {
-                                        "type": "boolean"
+                                        "type": "boolean",
+                                        "example": true
                                     }
                                 },
                                 "type": "object"
@@ -380,10 +403,28 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Category updated"
+                        "description": "Category updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Category not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 }
             },
@@ -409,6 +450,9 @@
                     },
                     "404": {
                         "description": "Category not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
                     }
                 }
             }
@@ -984,6 +1028,27 @@
     },
     "components": {
         "schemas": {
+            "Category": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Electronics"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "All electronic items"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
             "Role": {
                 "properties": {
                     "id": {

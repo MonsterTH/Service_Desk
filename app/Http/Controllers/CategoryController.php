@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Http\Resources\CategoryResource;
 use OpenApi\Attributes as OA;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 class CategoryController extends Controller
 {
     use AuthorizesRequests;
@@ -18,14 +20,16 @@ class CategoryController extends Controller
             new OA\Response(
                 response: 200,
                 description: 'List of categories',
-                content: new OA\JsonContent(type: 'array', items: new OA\Items(
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'name', type: 'string'),
-                        new OA\Property(property: 'description', type: 'string'),
-                        new OA\Property(property: 'is_active', type: 'boolean'),
-                    ]
-                ))
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: '#/components/schemas/Category'
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated'
             )
         ]
     )]
@@ -33,30 +37,62 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        return response()->json(Category::all());
+        return CategoryResource::collection(Category::all());
     }
 
     #[OA\Post(
         path: '/api/categories',
         summary: 'Create a new category',
         tags: ['Categories'],
+        security: [
+            ['bearerAuth' => []]
+        ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['name', 'description', 'is_active'],
+                required: ['name'],
                 properties: [
-                    new OA\Property(property: 'name', type: 'string', example: 'My category'),
-                    new OA\Property(property: 'description', type: 'string', example: 'Category description'),
-                    new OA\Property(property: 'is_active', type: 'boolean', example: true),
+                    new OA\Property(
+                        property: 'name',
+                        type: 'string',
+                        example: 'Electronics'
+                    ),
+                    new OA\Property(
+                        property: 'description',
+                        type: 'string',
+                        example: 'All electronic items'
+                    ),
+                    new OA\Property(
+                        property: 'is_active',
+                        type: 'boolean',
+                        example: true
+                    ),
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 201, description: 'Category created'),
-            new OA\Response(response: 422, description: 'Validation error'),
+            new OA\Response(
+                response: 201,
+                description: 'Category created',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Category'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error'
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated'
+            )
         ]
     )]
-
     public function store(Request $request)
     {
         $this->authorize('create', Category::class);
@@ -73,7 +109,7 @@ class CategoryController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return response()->json($category, 201);
+        return new CategoryResource($category);
     }
 
     #[OA\Get(
@@ -81,18 +117,39 @@ class CategoryController extends Controller
         summary: 'Get a category by ID',
         tags: ['Categories'],
         parameters: [
-            new OA\Parameter(name: 'category', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+            new OA\Parameter(
+                name: 'category',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Category found'),
+            new OA\Response(
+                response: 200,
+                description: 'Category found',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Category'
+                        )
+                    ]
+                )
+            ),
             new OA\Response(response: 404, description: 'Category not found'),
+
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated'
+            )
         ]
     )]
     public function show(Category $category)
     {
         $this->authorize('view', Category::class);
 
-        return response()->json($category);
+        return new CategoryResource($category);
     }
 
     #[OA\Put(
@@ -100,20 +157,61 @@ class CategoryController extends Controller
         summary: 'Update a category',
         tags: ['Categories'],
         parameters: [
-            new OA\Parameter(name: 'category', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+            new OA\Parameter(
+                name: 'category',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            )
         ],
         requestBody: new OA\RequestBody(
+            required: true,
             content: new OA\JsonContent(
+                required: ['name'],
                 properties: [
-                    new OA\Property(property: 'name', type: 'string'),
-                    new OA\Property(property: 'description', type: 'string'),
-                    new OA\Property(property: 'is_active', type: 'boolean'),
+                    new OA\Property(
+                        property: 'name',
+                        type: 'string',
+                        example: 'Electronics'
+                    ),
+                    new OA\Property(
+                        property: 'description',
+                        type: 'string',
+                        example: 'All electronic items'
+                    ),
+                    new OA\Property(
+                        property: 'is_active',
+                        type: 'boolean',
+                        example: true
+                    ),
                 ]
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Category updated'),
-            new OA\Response(response: 404, description: 'Category not found'),
+            new OA\Response(
+                response: 200,
+                description: 'Category updated',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/Category'
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Category not found'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error'
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated'
+            )
         ]
     )]
     public function update(Request $request, Category $category)
@@ -128,7 +226,7 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return response()->json($category);
+        return new CategoryResource($category);
     }
 
     #[OA\Delete(
@@ -146,6 +244,10 @@ class CategoryController extends Controller
         responses: [
             new OA\Response(response: 200, description: 'Category deleted'),
             new OA\Response(response: 404, description: 'Category not found'),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthenticated'
+            )
         ]
     )]
     public function destroy(Category $category)
@@ -154,6 +256,8 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return response()->json(['message' => 'Category deleted']);
+        return response()->json([
+            'message' => 'Category deleted'
+        ]);
     }
 }

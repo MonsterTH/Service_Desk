@@ -194,9 +194,10 @@ class AuthController extends Controller
                 description: 'Authenticated user',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'name', type: 'string'),
-                        new OA\Property(property: 'email', type: 'string'),
+                        new OA\Property(
+                            property: 'data',
+                            ref: '#/components/schemas/User'
+                        ),
 
                         new OA\Property(
                             property: 'roles',
