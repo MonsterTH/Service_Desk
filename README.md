@@ -39,10 +39,6 @@ DB_DATABASE=laravel
 DB_USERNAME=laravel
 DB_PASSWORD=secret
 
-CACHE_DRIVER=file  
-QUEUE_CONNECTION=sync  
-SESSION_DRIVER=file  
-
 L5_SWAGGER_GENERATE_ALWAYS=true
 L5_SWAGGER_CONST_HOST=http://localhost/api
 ```
