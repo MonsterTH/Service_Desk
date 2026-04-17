@@ -23,7 +23,11 @@ Sistema de gestão de tickets com comentários, autenticação e controlo de per
 
 O projeto está totalmente automatizado.
 
-👉 Basta executar:
+### 1. Clonar o projeto
+git clone https://github.com/MonsterTH/Service_Desk.git  
+cd Service_Desk  
+
+Depois executar:
 
 ```bash
 docker compose up --build
