@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Observers\TicketObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy(TicketObserver::class)]
 class Ticket extends Model
 {
     use HasFactory, SoftDeletes;
@@ -55,5 +58,10 @@ class Ticket extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(TicketLog::class)->latest();
     }
 }
