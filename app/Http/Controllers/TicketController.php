@@ -60,6 +60,12 @@ class TicketController extends Controller
                 required: false,
                 schema: new OA\Schema(type: 'integer', example: 1)
             ),
+            new OA\Parameter(
+                name: 'ItemsPerPage',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', example: 5)
+            ),
         ],
         responses: [
             new OA\Response(
@@ -129,7 +135,7 @@ class TicketController extends Controller
         }
 
         return TicketResource::collection(
-            $query->paginate(20)
+            $query->paginate(request()->input('ItemsPerPage', 5))
         );
     }
 

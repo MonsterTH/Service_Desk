@@ -30,6 +30,12 @@ class CommentController extends Controller
                 required: false,
                 schema: new OA\Schema(type: 'integer', example: 1)
             ),
+            new OA\Parameter(
+                name: 'ItemsPerPage',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', example: 5)
+            ),
         ],
         responses: [
             new OA\Response(
@@ -59,7 +65,7 @@ class CommentController extends Controller
             $query->where('is_internal', false);
         }
 
-        return CommentResource::collection($query->paginate(20));
+        return CommentResource::collection($query->paginate(request()->input('ItemsPerPage', 5)));
     }
 
     #[OA\Post(

@@ -244,6 +244,15 @@
                             "type": "integer",
                             "example": 1
                         }
+                    },
+                    {
+                        "name": "ItemsPerPage",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
                     }
                 ],
                 "responses": {

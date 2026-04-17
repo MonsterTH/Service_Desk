@@ -23,6 +23,12 @@ class CategoryController extends Controller
                 required: false,
                 schema: new OA\Schema(type: 'integer', example: 1)
             ),
+            new OA\Parameter(
+                name: 'ItemsPerPage',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', example: 5)
+            ),
         ],
         responses: [
             new OA\Response(
@@ -45,7 +51,7 @@ class CategoryController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        return CategoryResource::collection(Category::paginate(20));
+        return CategoryResource::collection(Category::paginate(request()->input('ItemsPerPage', 5)));
     }
 
     #[OA\Post(
