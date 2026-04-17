@@ -52,7 +52,7 @@ class TicketPolicy
         }
 
         return $user->hasRole('admin')
-            || ($user->hasRole('agent') && $this->isAssignedToUser($user, $ticket))
+            || ($user->hasRole('agent') && $this->isAssignedToUser($user, $ticket) || $ticket->created_by === $user->id)
             || ($user->hasRole('employee') && $ticket->created_by === $user->id);
     }
 

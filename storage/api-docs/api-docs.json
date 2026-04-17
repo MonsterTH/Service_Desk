@@ -1439,7 +1439,7 @@
                     },
                     "assigned_to": {
                         "type": "integer",
-                        "example": null,
+                        "example": 2,
                         "nullable": true
                     },
                     "created_by": {
