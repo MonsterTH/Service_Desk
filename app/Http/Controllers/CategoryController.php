@@ -160,7 +160,7 @@ class CategoryController extends Controller
     )]
     public function show(Category $category)
     {
-        $this->authorize('view', Category::class);
+        $this->authorize('view', $category);
 
         return new CategoryResource($category);
     }
@@ -229,7 +229,7 @@ class CategoryController extends Controller
     )]
     public function update(Request $request, Category $category)
     {
-        $this->authorize('update', Category::class);
+        $this->authorize('update', $category);
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -244,7 +244,7 @@ class CategoryController extends Controller
 
     #[OA\Delete(
         path: '/api/categories/{category}',
-        summary: 'Delete a category',
+        summary: 'Delete a category (Only Admin)',
         tags: ['Categories'],
         parameters: [
             new OA\Parameter(
@@ -265,7 +265,7 @@ class CategoryController extends Controller
     )]
     public function destroy(Category $category)
     {
-        $this->authorize('delete', Category::class);
+        $this->authorize('delete', $category);
 
         $category->delete();
 

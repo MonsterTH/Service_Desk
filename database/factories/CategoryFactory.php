@@ -14,7 +14,7 @@ class CategoryFactory extends Factory
         return [
             'name' => $this->faker->unique()->word(),
             'description' => $this->faker->sentence(),
-            'is_active' => $this->faker->boolean(80), // 80% ativas
+            'is_active' => $this->faker->boolean(50),
         ];
     }
 }

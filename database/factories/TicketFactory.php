@@ -33,8 +33,8 @@ class TicketFactory extends Factory
             ]),
 
             'created_by' => User::factory(),
-            'assigned_to' => User::factory(),
-            'category_id' => Category::factory(),
+            // 'assigned_to' => User::factory(),
+            // 'category_id' => Category::factory(),
 
             'created_at' => now(),
             'updated_at' => now(),

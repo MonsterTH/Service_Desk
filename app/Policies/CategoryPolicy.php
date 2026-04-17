@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Category;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CategoryPolicy
 {
@@ -13,7 +12,7 @@ class CategoryPolicy
         return true;
     }
 
-    public function view(User $user): bool
+    public function view(User $user, Category $category): bool
     {
         return true;
     }
@@ -23,13 +22,15 @@ class CategoryPolicy
         return $user->hasRole('admin');
     }
 
-    public function update(User $user): bool
+    public function update(User $user, Category $category): bool
     {
         return $user->hasRole('admin');
     }
 
-    public function delete(User $user): bool
+    public function delete(User $user, Category $category): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('admin')
+            && $category->tickets()->doesntExist()
+            && !$category->is_active;
     }
 }

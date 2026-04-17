@@ -452,7 +452,7 @@
                 "tags": [
                     "Categories"
                 ],
-                "summary": "Delete a category",
+                "summary": "Delete a category (Only Admin)",
                 "operationId": "d9ecd5c4a74c4d75339251863eedc08c",
                 "parameters": [
                     {
@@ -932,7 +932,8 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "title"
+                                    "title",
+                                    "category_id"
                                 ],
                                 "properties": {
                                     "title": {

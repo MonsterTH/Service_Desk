@@ -14,8 +14,8 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'ticket_id' => Ticket::factory(),
-            'user_id' => User::factory(),
+            // 'ticket_id' => Ticket::factory(),
+            // 'user_id' => User::factory(),
 
             'comment' => $this->faker->paragraph(),
 

@@ -56,16 +56,25 @@ class DatabaseSeeder extends Seeder
         // });
 
         // CATEGORIES
-        $categories = Category::factory(5)->create();
+        $categories = Category::factory(10)->create();
 
         // TICKETS
-        Ticket::factory(20)->create([
+        $activeCategories = Category::where('is_active', true)->get();
+
+        Ticket::factory(100)->create([
             'created_by' => $employee->id,
             'assigned_to' => $agent->id,
-            'category_id' => $categories->random()->id,
+            'category_id' => fn () => $activeCategories->random()->id,
         ]);
 
         // COMMENTS
-        Comment::factory(50)->create();
+        $tickets = Ticket::all();
+        $employees = User::role('employee')->get();
+
+        Comment::factory(50)->make()->each(function ($comment) use ($tickets, $employees) {
+            $comment->ticket_id = $tickets->random()->id;
+            $comment->user_id = $employees->random()->id;
+            $comment->save();
+        });
     }
 }

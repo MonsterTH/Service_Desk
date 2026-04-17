@@ -146,7 +146,7 @@ class TicketController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['title'],
+                required: ['title', 'category_id'],
                 properties: [
                     new OA\Property(property: 'title', type: 'string', example: 'My ticket'),
                     new OA\Property(property: 'description', type: 'string'),
@@ -177,7 +177,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => ['required','exists:categories,id',]
         ]);
 
         $ticket = Ticket::create([
@@ -185,7 +185,7 @@ class TicketController extends Controller
             'description' => $validated['description'] ?? null,
             'status'      => 'open',
             'priority'    => 'low',
-            'category_id' => $validated['category_id'] ?? null,
+            'category_id' => $validated['category_id'],
             'assigned_to' => null,
             'created_by'  => $request->user()->id,
         ]);

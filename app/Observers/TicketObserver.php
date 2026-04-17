@@ -5,6 +5,8 @@ namespace App\Observers;
 use App\Models\Ticket;
 use App\Models\TicketLog;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Category;
+use Illuminate\Validation\ValidationException;
 
 class TicketObserver
 {
@@ -35,6 +37,19 @@ class TicketObserver
                         'from' => $original[$field],
                         'to'   => $dirty[$field],
                     ],
+                ]);
+            }
+        }
+    }
+
+    public function saving(Ticket $ticket): void
+    {
+        if ($ticket->category_id) {
+            $category = Category::find($ticket->category_id);
+
+            if (! $category || ! $category->is_active) {
+                throw ValidationException::withMessages([
+                    'category_id' => 'Only active categories can be assigned to tickets.',
                 ]);
             }
         }
