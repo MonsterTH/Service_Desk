@@ -461,7 +461,6 @@ class TicketController extends Controller
 
     public function updatePriority(Request $request, Ticket $ticket)
     {
-        // chama a policy
         $this->authorize('updatePriority', $ticket);
 
         $validated = $request->validate([
