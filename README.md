@@ -46,7 +46,7 @@ L5_SWAGGER_CONST_HOST=http://localhost/api
 ### 3. Execução
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 ## 👤 Utilizadores de teste
