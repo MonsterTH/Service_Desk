@@ -27,7 +27,7 @@ O projeto está totalmente automatizado.
 git clone https://github.com/MonsterTH/Service_Desk.git  
 cd Service_Desk  
 
-### 2. Configurar o .env
+### 2. Configurar o .env (Renomear o .env.example para .env primeiro)
 ```bash
 APP_NAME="Service Desk"  
 APP_URL=http://localhost:8000  
