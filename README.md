@@ -29,7 +29,7 @@ O projeto está totalmente automatizado.
 docker compose up --build
 ```
 
-# 👤 Utilizadores de teste
+## 👤 Utilizadores de teste
 
 Admin  
 admin@example.com / password  
@@ -41,7 +41,7 @@ Employee
 employee@example.com / password  
 
 
-# 🔑 Roles
+## 🔑 Roles
 
 Admin:
 - gerir tickets
