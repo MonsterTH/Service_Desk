@@ -28,7 +28,7 @@ git clone https://github.com/MonsterTH/Service_Desk.git
 cd Service_Desk  
 
 ### 2. Configurar o .env
-
+```bash
 APP_NAME="Service Desk"  
 APP_URL=http://localhost:8000  
 
@@ -45,6 +45,7 @@ SESSION_DRIVER=file
 
 L5_SWAGGER_GENERATE_ALWAYS=true
 L5_SWAGGER_CONST_HOST=http://localhost/api
+```
 
 ### 3. Execução
 
