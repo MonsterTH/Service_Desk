@@ -27,7 +27,26 @@ O projeto está totalmente automatizado.
 git clone https://github.com/MonsterTH/Service_Desk.git  
 cd Service_Desk  
 
-Depois executar:
+### 2. Configurar o .env
+
+APP_NAME="Service Desk"  
+APP_URL=http://localhost:8000  
+
+DB_CONNECTION=mysql  
+DB_HOST=db  
+DB_PORT=3306  
+DB_DATABASE=laravel  
+DB_USERNAME=laravel  
+DB_PASSWORD=secret  
+
+CACHE_DRIVER=file  
+QUEUE_CONNECTION=sync  
+SESSION_DRIVER=file  
+
+L5_SWAGGER_GENERATE_ALWAYS=true
+L5_SWAGGER_CONST_HOST=http://localhost/api
+
+### 3. Execução
 
 ```bash
 docker compose up --build
