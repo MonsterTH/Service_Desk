@@ -32,12 +32,12 @@ cd Service_Desk
 APP_NAME="Service Desk"  
 APP_URL=http://localhost:8000  
 
-DB_CONNECTION=mysql  
-DB_HOST=db  
-DB_PORT=3306  
-DB_DATABASE=laravel  
-DB_USERNAME=laravel  
-DB_PASSWORD=secret  
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=laravel
+DB_PASSWORD=secret
 
 CACHE_DRIVER=file  
 QUEUE_CONNECTION=sync  
