@@ -47,11 +47,24 @@ class CategoryController extends Controller
             )
         ]
     )]
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Category::class);
 
-        return CategoryResource::collection(Category::paginate(request()->input('ItemsPerPage', 5)));
+        $perPage = $request->input('ItemsPerPage', 5);
+        $page = (int) $request->input('page', 1);
+
+        $paginator = Category::paginate($perPage, ['*'], 'page', $page);
+
+        $data = CategoryResource::collection($paginator);
+
+        return $data->additional([
+            'meta' => [
+                'message' => $paginator->count() === 0
+                    ? 'No results for this page'
+                    : null,
+            ],
+        ]);
     }
 
     #[OA\Post(

@@ -65,7 +65,20 @@ class CommentController extends Controller
             $query->where('is_internal', false);
         }
 
-        return CommentResource::collection($query->paginate(request()->input('ItemsPerPage', 5)));
+        $perPage = $request->input('ItemsPerPage', 5);
+        $page = (int) $request->input('page', 1);
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $data = CommentResource::collection($paginator);
+
+        return $data->additional([
+            'meta' => [
+                'message' => $paginator->count() === 0
+                    ? 'No results for this page'
+                    : null,
+            ],
+        ]);
     }
 
     #[OA\Post(

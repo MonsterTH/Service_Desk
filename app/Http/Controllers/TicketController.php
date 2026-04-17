@@ -99,6 +99,7 @@ class TicketController extends Controller
             'category_id' => 'nullable|integer|exists:categories,id',
             'assigned_to' => 'nullable|integer|exists:users,id',
             'search' => 'nullable|string|max:255',
+            'ItemsPerPage' => 'nullable|integer|min:1|max:5',
         ]);
 
         $query = Ticket::with(['category', 'creator', 'assignee'])
@@ -134,9 +135,20 @@ class TicketController extends Controller
             $query->where('created_by', $user->id);
         }
 
-        return TicketResource::collection(
-            $query->paginate(request()->input('ItemsPerPage', 5))
-        );
+        $perPage = $validated['ItemsPerPage'] ?? 5;
+        $page = (int) $request->input('page', 1);
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $data = TicketResource::collection($paginator);
+
+        return $data->additional([
+            'meta' => [
+                'message' => $paginator->count() === 0
+                    ? 'No results for this page'
+                    : null,
+            ],
+        ]);
     }
 
     #[OA\Post(
