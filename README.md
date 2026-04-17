@@ -27,3 +27,4 @@ O projeto está totalmente automatizado.
 
 ```bash
 docker compose up --build
+```
