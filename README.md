@@ -6,277 +6,175 @@ Sistema de gestão de tickets com comentários, autenticação e controlo de per
 
 ## 🧱 Stack
 
-* Laravel 13
-* PHP 8.3 (Apache)
-* MariaDB 10.8
-* Laravel Sanctum
-* Spatie Laravel Permission
-* Docker & Docker Compose
-* Adminer (DB UI)
-* L5-Swagger
+- Laravel 13
+- PHP 8.3 (Apache)
+- MariaDB 10.8
+- Laravel Sanctum
+- Spatie Laravel Permission
+- Docker & Docker Compose
+- Adminer (DB UI)
+- L5-Swagger
+
+---
+
+## 📌 Endpoints principais
+
+POST /api/login  
+GET /api/tickets  
+POST /api/tickets  
 
 ---
 
 ## 🚀 Instalação e execução (Docker)
 
 ### 1. Clonar o projeto
-
-```bash
-git clone https://github.com/MonsterTH/Service_Desk.git
-cd service-desk
-```
-
----
+git clone https://github.com/MonsterTH/Service_Desk.git  
+cd Service_Desk  
 
 ### 2. Subir os containers
-
-```bash
-docker-compose up -d --build
-```
-
----
+docker compose up -d --build  
 
 ### 3. Verificar containers
-
-```bash
-docker ps
-```
+docker ps  
 
 Deves ver:
-
-* Service_Desk (app)
-* laravel_db (MariaDB)
-* adminer
-
----
+- Service_Desk (app)
+- laravel_db (MariaDB)
+- adminer
 
 ### 4. Entrar no container
-
-```bash
-docker exec -it Service_Desk bash
-```
-
----
+docker exec -it Service_Desk bash  
 
 ### 5. Instalar dependências
+composer install  
 
-```bash
-composer install
-```
+### 6. Configurar o .env
 
----
+APP_NAME="Service Desk"  
+APP_URL=http://localhost:8000  
 
-### 6. Configurar o `.env`
+DB_CONNECTION=mysql  
+DB_HOST=db  
+DB_PORT=3306  
+DB_DATABASE=laravel  
+DB_USERNAME=laravel  
+DB_PASSWORD=secret  
 
-```env
-APP_NAME="Service Desk"
-APP_URL=http://localhost:8000
+CACHE_DRIVER=file  
+QUEUE_CONNECTION=sync  
+SESSION_DRIVER=file  
 
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=laravel
-DB_PASSWORD=secret
+L5_SWAGGER_GENERATE_ALWAYS=true
+L5_SWAGGER_CONST_HOST=http://localhost/api
+L5_SWAGGER_CONST_HOST=http://localhost/api
 
-CACHE_DRIVER=file
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-```
+### 7. Gerar chave da aplicação
+php artisan key:generate  
 
-Gerar chave da aplicação:
+### 8. Migrar e popular base de dados
+php artisan migrate:fresh --seed  
 
-```bash
-php artisan key:generate
-```
+### 9. Instalar Swagger (caso não esteja instalado)
+composer require darkaonline/l5-swagger  
 
----
+### 10. Publicar Swagger
+php artisan vendor:publish --provider="L5Swagger\\L5SwaggerServiceProvider"  
 
-### 7. Migrar e popular base de dados
-
-```bash
-php artisan migrate:fresh --seed
-```
+### 11. Gerar documentação Swagger
+php artisan l5-swagger:generate  
 
 ---
 
-### 8. Gerar documentação Swagger
-
-```bash
-php artisan l5-swagger:generate
-```
-
----
-
-## 📄 Documentação da API (Swagger)
-
-Disponível em:
-
-http://localhost:8000/api/documentation
+## 📄 Swagger
+http://localhost:8000/api/documentation  
 
 ---
 
 ## 🔐 Autenticação
 
-A API utiliza Laravel Sanctum com autenticação via token.
+POST /api/login  
 
-### Login
-
-```http
-POST /api/login
-```
-
-Body exemplo:
-
-```json
+Body:
 {
-  "email": "admin@test.com",
+  "email": "admin@example.com",
   "password": "password"
 }
-```
 
-### Utilizar o token
-
-Adicionar no header:
-
-```http
+Header:
 Authorization: Bearer {token}
-```
 
 ---
 
 ## 👤 Utilizadores de teste
 
-Criados automaticamente pelos seeders:
+Admin  
+admin@example.com / password  
 
-**Admin**
+Agent  
+agent@example.com / password  
 
-* Email: [admin@test.com](mailto:admin@test.com)
-* Password: password
-
-**User**
-
-* Email: [user@test.com](mailto:user@test.com)
-* Password: password
+Employee  
+employee@example.com / password  
 
 ---
 
-## 🔑 Roles e Permissões
+## 🔑 Roles
 
-Sistema gerido com Spatie Laravel Permission.
+Admin:
+- gerir tickets
+- gerir utilizadores
+- ver tudo
 
-### Roles disponíveis:
+Agent:
+- gerir os tickets que lhe foram atribuídos
+- comentar internamente ou não
+- ver todos os tickets criados por si ou atribuídos a si
 
-* **Admin**
-
-  * Criar, editar e apagar tickets
-  * Gerir utilizadores
-  * Ver todos os tickets
-
-* **User**
-
-  * Criar tickets
-  * Comentar tickets
-  * Ver apenas os seus tickets
-
----
-
-## 🛡️ Proteção de rotas
-
-Endpoints protegidos com middleware:
-
-```php
-auth:sanctum
-```
-
-Exemplo:
-
-```http
-GET /api/tickets
-```
-
-Requer autenticação.
+Employee:
+- criar tickets
+- comentar
+- ver apenas os seus
 
 ---
 
-## 📊 Validação e respostas HTTP
-
-A API utiliza validação Laravel:
-
-```php
-$request->validate([
-    'title' => 'required|string|max:255'
-]);
-```
-
-Status codes utilizados:
-
-* 200 OK
-* 201 Created
-* 400 Bad Request
-* 401 Unauthorized
-* 404 Not Found
+## 🛡️ Segurança
+auth:sanctum protege os endpoints autenticados  
 
 ---
 
-## 🌐 Acesso ao sistema
-
-### API
-
-http://localhost:8000/api
-
-### Swagger
-
-http://localhost:8000/api/documentation
-
-### Aplicação
-
-http://localhost:8000
-
-### Adminer
-
-http://localhost:8080
-
-Login com os dados do `.env`.
+## 📊 HTTP status
+200 OK  
+201 Created  
+400 Bad Request  
+401 Unauthorized  
+404 Not Found  
 
 ---
 
-## ✅ Checklist de entrega
+## 🌐 Acesso
 
-* ✔ API funcional
-* ✔ Docker configurado
-* ✔ Migrations
-* ✔ Seeders com dados reais
-* ✔ Autenticação com Sanctum
-* ✔ Roles e permissões
-* ✔ Utilizadores de teste
-* ✔ Swagger funcional
-* ✔ Validação e status codes
-* ✔ README com instruções
+API: http://localhost:8000/api  
+Swagger: http://localhost:8000/api/documentation  
+Aplicação: http://localhost:8000  
+Adminer: http://localhost:8080  
 
 ---
 
-## ⚠️ Notas
+## Como obter o token
 
-Após clonar o projeto, deve ser possível executar:
+Fazer login → copiar o token → utilizar no header Bearer
 
-```bash
-docker-compose up -d --build
-```
+---
 
-E depois:
+## ⚠️ Nota final
 
-```bash
-php artisan migrate:fresh --seed
-```
+Após clonar:
 
-Sem erros.
+docker compose up -d --build  
+docker exec -it Service_Desk bash  
+composer install  
+php artisan key:generate  
+php artisan migrate:fresh --seed  
+php artisan l5-swagger:generate  
 
-Caso o Swagger não esteja instalado, execute:
-```bash
-composer require "darkaonline/l5-swagger"
-```
-E depois para publicar:
-```bash
-php artisan vendor:publish --provider="L5Swagger\\L5SwaggerServiceProvider"
-```
+O projeto deve funcionar sem erros.

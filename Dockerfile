@@ -1,15 +1,19 @@
 FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
-    libzip-dev zip unzip curl \
-    && docker-php-ext-install pdo pdo_mysql \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    libzip-dev \
+    zip \
+    unzip \
+    curl \
+    git \
+    && docker-php-ext-install pdo pdo_mysql zip
 
 RUN a2enmod rewrite
 
 RUN cat <<EOF > /etc/apache2/sites-available/000-default.conf
 <VirtualHost *:80>
     DocumentRoot /var/www/public
+
     <Directory /var/www/public>
         AllowOverride All
         Require all granted
@@ -23,9 +27,8 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install
-
-RUN chown -R www-data:www-data /var/www \
+RUN mkdir -p storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 80

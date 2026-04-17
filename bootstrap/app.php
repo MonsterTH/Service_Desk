@@ -49,7 +49,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // });
 
         $exceptions->render(function (\Throwable $e, $request) {
-
             if ($request->is('api/*')) {
 
                 $status = $e instanceof HttpExceptionInterface
