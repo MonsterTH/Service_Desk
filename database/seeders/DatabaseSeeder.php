@@ -51,18 +51,20 @@ class DatabaseSeeder extends Seeder
         ]);
         $employee->assignRole('employee');
 
-        // User::factory(5)->create()->each(function ($user) {
-        //     $user->assignRole('employee');
-        // });
+        User::factory(20)->create()->each(function ($user) {
+            $user->assignRole('employee');
+        });
 
         // CATEGORIES
         $categories = Category::factory(10)->create();
 
         // TICKETS
         $activeCategories = Category::where('is_active', true)->get();
+        $users = User::all();
+
 
         Ticket::factory(100)->create([
-            'created_by' => $employee->id,
+            'created_by' => fn () => $users->random()->id,
             'assigned_to' => $agent->id,
             'category_id' => fn () => $activeCategories->random()->id,
         ]);

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Illuminate\Auth\AuthenticationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -47,6 +48,14 @@ return Application::configure(basePath: dirname(__DIR__))
         //         ], 404);
         //     }
         // });
+
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Unauthenticated.'
+                ], 401);
+            }
+        });
 
         $exceptions->render(function (\Throwable $e, $request) {
             if ($request->is('api/*')) {
