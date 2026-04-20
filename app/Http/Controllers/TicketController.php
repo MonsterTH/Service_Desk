@@ -13,6 +13,12 @@ class TicketController extends Controller
 {
     use AuthorizesRequests;
 
+
+    #[OA\Tag(
+        name: "Tickets",
+        description: "Ticket management system (CRUD, assignment, status and priority updates)"
+    )]
+
     #[OA\Get(
         path: '/api/tickets',
         summary: 'List all tickets with filters',
@@ -99,7 +105,7 @@ class TicketController extends Controller
             'category_id' => 'nullable|integer|exists:categories,id',
             'assigned_to' => 'nullable|integer|exists:users,id',
             'search' => 'nullable|string|max:255',
-            'ItemsPerPage' => 'nullable|integer|min:1|max:5',
+            'ItemsPerPage' => 'nullable|integer|min:1',
         ]);
 
         $query = Ticket::with(['category', 'creator', 'assignee'])
@@ -136,7 +142,7 @@ class TicketController extends Controller
         }
 
         $perPage = $validated['ItemsPerPage'] ?? 5;
-        $page = (int) $request->input('page', 1);
+        $page = max(1, (int) $request->input('page', 1));
 
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -347,6 +353,7 @@ class TicketController extends Controller
                     ),
             new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Ticket not found'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
@@ -408,6 +415,7 @@ class TicketController extends Controller
                 ),
             new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Ticket not found'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
@@ -467,6 +475,7 @@ class TicketController extends Controller
                 ),
             new OA\Response(response: 401, description: 'Unauthorized'),
             new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Ticket not found'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]

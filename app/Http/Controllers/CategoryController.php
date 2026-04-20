@@ -12,6 +12,11 @@ class CategoryController extends Controller
 {
     use AuthorizesRequests;
 
+    #[OA\Tag(
+        name: "Categories",
+        description: "Category management endpoints (CRUD operations)"
+    )]
+
     #[OA\Get(
         path: '/api/categories',
         summary: 'List all categories',

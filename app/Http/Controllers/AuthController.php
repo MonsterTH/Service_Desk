@@ -10,17 +10,23 @@ use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
+    #[OA\Tag(
+        name: "Auth",
+        description: "Login, registration and user session management"
+    )]
+
     #[OA\Post(
         path: '/api/register',
         summary: 'Register a new user',
         tags: ['Auth'],
+        security: [],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 required: ['name', 'email', 'password'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', example: 'John Doe'),
-                    new OA\Property(property: 'email', type: 'string', example: 'john@example.com'),
+                    new OA\Property(property: 'email', type: 'string', example: 'johndoe@example.com'),
                     new OA\Property(property: 'password', type: 'string', example: 'password123'),
                 ]
             )
@@ -95,6 +101,7 @@ class AuthController extends Controller
         path: '/api/login',
         summary: 'Login a user',
         tags: ['Auth'],
+        security: [],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -126,6 +133,10 @@ class AuthController extends Controller
             new OA\Response(
                 response: 401,
                 description: 'Invalid credentials'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error',
             )
         ]
     )]
@@ -134,7 +145,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required|string'
         ]);
 
         $user = User::where('email', strtolower($request->email))->first();

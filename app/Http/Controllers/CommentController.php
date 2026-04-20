@@ -13,6 +13,11 @@ class CommentController extends Controller
 {
     use AuthorizesRequests;
 
+    #[OA\Tag(
+        name: "Comments",
+        description: "Ticket comments management (public and internal comments)"
+    )]
+
     #[OA\Get(
         path: '/api/tickets/{ticket}/comments',
         summary: 'List all comments of a ticket',
@@ -65,8 +70,12 @@ class CommentController extends Controller
             $query->where('is_internal', false);
         }
 
-        $perPage = $request->input('ItemsPerPage', 5);
-        $page = (int) $request->input('page', 1);
+        $validated = $request->validate([
+            'ItemsPerPage' => 'nullable|integer|min:1',
+        ]);
+
+        $perPage = $validated['ItemsPerPage'] ?? 15;
+        $page = max(1, (int) $request->input('page', 1));
 
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
