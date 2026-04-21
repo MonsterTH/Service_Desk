@@ -15,6 +15,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',[AuthController::class, 'logout']);
 
     Route::apiResource('tickets', TicketController::class);
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])
+        ->withTrashed();
 
     Route::patch('tickets/{ticket}/assign', [TicketController::class, 'assign'])
         ->middleware('role:admin|agent');

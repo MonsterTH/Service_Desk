@@ -14,6 +14,8 @@ class TicketFactory extends Factory
 
     public function definition(): array
     {
+        $createdAt = fake()->dateTimeBetween('-2 years', 'now');
+
         return [
             'title' => $this->faker->sentence(6),
             'description' => $this->faker->paragraph(),
@@ -36,9 +38,8 @@ class TicketFactory extends Factory
             // 'assigned_to' => User::factory(),
             // 'category_id' => Category::factory(),
 
-            'created_at' => now(),
-            'updated_at' => now(),
-
+            'created_at' => $createdAt,
+            'updated_at' => fake()->dateTimeBetween($createdAt, 'now'),
         ];
     }
 }

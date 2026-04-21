@@ -14,6 +14,8 @@ class CommentResource extends JsonResource
             'ticket_id' => $this->ticket_id,
             'user_id' => $this->user_id,
             'comment' => $this->comment,
+            'created_at' => $this->created_at->diffForHumans(),
+            'updated_at' => $this->updated_at->diffForHumans(),
             'is_internal' => (bool) $this->is_internal,
 
             'ticket' => $this->whenLoaded('ticket', function () {

@@ -18,6 +18,8 @@ class TicketResource extends JsonResource
             'category_id' => $this->category_id,
             'assigned_to' => $this->assigned_to,
             'created_by'  => $this->created_by,
+            'created_at'  => $this->created_at->diffForHumans(),
+            'updated_at'  => $this->updated_at->diffForHumans(),
 
             'category' => $this->whenLoaded('category', fn() => [
                 'id'   => $this->category->id,
@@ -33,6 +35,8 @@ class TicketResource extends JsonResource
                 'id'   => $this->assignee->id,
                 'name' => $this->assignee->name,
             ]),
+
+            'deleted_at' => $this->deleted_at ? $this->deleted_at->diffForHumans() : null,
         ];
     }
 }

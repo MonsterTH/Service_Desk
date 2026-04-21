@@ -834,7 +834,9 @@
                             "type": "string",
                             "enum": [
                                 "open",
-                                "in_progress"
+                                "in_progress",
+                                "resolved",
+                                "closed"
                             ]
                         }
                     },
@@ -866,6 +868,24 @@
                         "required": false,
                         "schema": {
                             "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "created_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
                         }
                     },
                     {

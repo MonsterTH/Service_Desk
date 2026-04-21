@@ -8,6 +8,7 @@ use App\Models\User;
 use OpenApi\Attributes as OA;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Resources\TicketResource;
+use App\QueryFilters\TicketFilter;
 
 class TicketController extends Controller
 {
@@ -30,7 +31,7 @@ class TicketController extends Controller
                 required: false,
                 schema: new OA\Schema(
                     type: 'string',
-                    enum: ['open', 'in_progress']
+                    enum: ['open', 'in_progress', 'resolved', 'closed']
                 )
             ),
             new OA\Parameter(
@@ -53,6 +54,18 @@ class TicketController extends Controller
                 in: 'query',
                 required: false,
                 schema: new OA\Schema(type: 'integer')
+            ),
+            new OA\Parameter(
+                name: 'created_from',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'date')
+            ),
+            new OA\Parameter(
+                name: 'created_to',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'date')
             ),
             new OA\Parameter(
                 name: 'search',
@@ -93,44 +106,15 @@ class TicketController extends Controller
         ]
     )]
 
-    public function index(Request $request)
+    public function index(Request $request, TicketFilter $filter)
     {
         $this->authorize('viewAny', Ticket::class);
 
+        $query = Ticket::with(['category', 'creator', 'assignee']);
+
+        $query = $filter->apply($query, $request);
+
         $user = $request->user();
-
-        $validated = $request->validate([
-            'status' => 'nullable|in:open,in_progress,resolved,closed',
-            'priority' => 'nullable|in:low,medium,high,urgent',
-            'category_id' => 'nullable|integer|exists:categories,id',
-            'assigned_to' => 'nullable|integer|exists:users,id',
-            'search' => 'nullable|string|max:255',
-            'ItemsPerPage' => 'nullable|integer|min:1',
-        ]);
-
-        $query = Ticket::with(['category', 'creator', 'assignee'])
-            ->whereNotIn('status', ['resolved', 'closed']);
-
-        // filtros seguros
-        if (!empty($validated['status'])) {
-            $query->where('status', $validated['status']);
-        }
-
-        if (!empty($validated['priority'])) {
-            $query->where('priority', $validated['priority']);
-        }
-
-        if (!empty($validated['category_id'])) {
-            $query->where('category_id', $validated['category_id']);
-        }
-
-        if (!empty($validated['assigned_to'])) {
-            $query->where('assigned_to', $validated['assigned_to']);
-        }
-
-        if (!empty($validated['search'])) {
-            $query->where('title', 'like', '%' . $validated['search'] . '%');
-        }
 
         if ($user->hasRole('agent')) {
             $query->where('assigned_to', $user->id)
@@ -141,20 +125,11 @@ class TicketController extends Controller
             $query->where('created_by', $user->id);
         }
 
-        $perPage = $validated['ItemsPerPage'] ?? 5;
-        $page = max(1, (int) $request->input('page', 1));
+        $paginator = $query->paginate(
+            $request->input('ItemsPerPage', 5)
+        );
 
-        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
-
-        $data = TicketResource::collection($paginator);
-
-        return $data->additional([
-            'meta' => [
-                'message' => $paginator->count() === 0
-                    ? 'No results for this page'
-                    : null,
-            ],
-        ]);
+        return TicketResource::collection($paginator);
     }
 
     #[OA\Post(
