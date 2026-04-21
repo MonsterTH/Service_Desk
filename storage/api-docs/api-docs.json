@@ -1386,6 +1386,14 @@
                         "type": "string",
                         "example": "This is a comment"
                     },
+                    "created_at": {
+                        "type": "string",
+                        "example": "6 months ago"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "example": "2 days ago"
+                    },
                     "is_internal": {
                         "type": "boolean",
                         "example": false
@@ -1486,6 +1494,14 @@
                     "created_by": {
                         "type": "integer",
                         "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "example": "6 months ago"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "example": "2 days ago"
                     },
                     "category": {
                         "properties": {

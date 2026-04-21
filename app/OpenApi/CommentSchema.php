@@ -12,6 +12,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'ticket_id', type: 'integer', example: 10),
         new OA\Property(property: 'user_id', type: 'integer', example: 5),
         new OA\Property(property: 'comment', type: 'string', example: 'This is a comment'),
+        new OA\Property(property: 'created_at', type: 'string', example: '6 months ago'),
+        new OA\Property(property: 'updated_at', type: 'string', example: '2 days ago'),
         new OA\Property(property: 'is_internal', type: 'boolean', example: false),
         new OA\Property(
             property: 'ticket',

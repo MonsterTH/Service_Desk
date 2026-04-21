@@ -16,6 +16,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'category_id', type: 'integer', nullable: true, example: 1),
         new OA\Property(property: 'assigned_to', type: 'integer', nullable: true, example: 2),
         new OA\Property(property: 'created_by', type: 'integer', example: 1),
+        new OA\Property(property: 'created_at', type: 'string', example: '6 months ago'),
+        new OA\Property(property: 'updated_at', type: 'string', example: '2 days ago'),
         new OA\Property(
             property: 'category',
             type: 'object',
