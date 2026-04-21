@@ -29,6 +29,19 @@ class TicketFilter
             )
             ->when($request->filled('search'), fn ($q) =>
                 $q->where('title', 'like', "%{$request->search}%")
-            );
+            )
+            ->when($request->filled('reopened'), function ($q) use ($request) {
+                if ($request->boolean('reopened')) {
+                    $q->where('reopened', true);
+                }
+            });
+            // ->when($request->has('reopened') && $request->input('reopened') == 'true', function ($query) {
+            //     $query->where('status', 'open')
+            //         ->whereHas('logs', function ($q) {
+            //             $q->where('action', 'status_changed')
+            //             ->where('changes->from', 'resolved')
+            //             ->where('changes->to', 'open');
+            //         });
+            // });
     }
 }

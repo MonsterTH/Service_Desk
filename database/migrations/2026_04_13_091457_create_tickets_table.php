@@ -23,6 +23,8 @@ return new class extends Migration
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])
                 ->default('low');
 
+            $table->boolean('reopened')->default(false);
+
             $table->foreignId('created_by')
                 ->constrained('users')
                 ->cascadeOnDelete();

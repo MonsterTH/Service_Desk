@@ -74,6 +74,13 @@ class TicketController extends Controller
                 schema: new OA\Schema(type: 'string')
             ),
             new OA\Parameter(
+                name: 'reopened',
+                in: 'query',
+                required: false,
+                description: 'Filter tickets that were resolved and reopened',
+                schema: new OA\Schema(type: 'boolean', example: true)
+            ),
+            new OA\Parameter(
                 name: 'page',
                 in: 'query',
                 required: false,
@@ -117,8 +124,7 @@ class TicketController extends Controller
         $user = $request->user();
 
         if ($user->hasRole('agent')) {
-            $query->where('assigned_to', $user->id)
-                ->whereIn('status', ['open', 'in_progress']);
+            $query->where('assigned_to', $user->id);
         }
 
         if ($user->hasRole('employee')) {
@@ -400,12 +406,22 @@ class TicketController extends Controller
         $this->authorize('updateStatus', $ticket);
 
         $validated = $request->validate([
-            'status' => 'required|in:open,in_progress,resolved,closed',
+            'status' => 'required|in:open,in_progress,closed,resolved',
         ]);
 
-        $ticket->update([
-            'status' => $validated['status'],
-        ]);
+        $newStatus = $validated['status'];
+
+        if (! $ticket->canTransitionTo($newStatus)) {
+            return response()->json([
+                'message' => "Cannot transition from {$ticket->status} to {$newStatus}"
+            ], 422);
+        }
+
+        // aplica regra de negócio no model
+        $ticket->markReopened($newStatus);
+
+        $ticket->status = $newStatus;
+        $ticket->save();
 
         return new TicketResource($ticket);
     }

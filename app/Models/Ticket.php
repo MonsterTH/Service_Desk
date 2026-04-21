@@ -18,9 +18,10 @@ class Ticket extends Model
         'description',
         'status',
         'priority',
+        'reopened',
         'created_by',
         'assigned_to',
-        'category_id',
+        'category_id'
     ];
 
     protected $with = ['category', 'creator', 'assignee'];
@@ -34,6 +35,28 @@ class Ticket extends Model
     public function isFinalState(): bool
     {
         return in_array($this->status, ['closed']);
+    }
+
+    public function markReopened(string $newStatus): void
+    {
+        if ($this->status === 'resolved' && $newStatus === 'open') {
+            $this->reopened = true;
+        }
+    }
+
+    public static function allowedTransitions(): array
+    {
+        return [
+            'open' => ['in_progress', 'closed'],
+            'in_progress' => ['resolved', 'open'],
+            'resolved' => ['open', 'closed'],
+            'closed' => [],
+        ];
+    }
+
+    public function canTransitionTo(string $newStatus): bool
+    {
+        return in_array($newStatus, self::allowedTransitions()[$this->status] ?? []);
     }
 
     // quem criou o ticket

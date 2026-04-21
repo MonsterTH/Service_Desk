@@ -34,6 +34,8 @@ class TicketFactory extends Factory
                 'urgent'
             ]),
 
+            'reopened' => $this->faker->boolean(30), // 20% chance
+
             'created_by' => User::factory(),
             // 'assigned_to' => User::factory(),
             // 'category_id' => Category::factory(),

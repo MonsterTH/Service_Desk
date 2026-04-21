@@ -897,6 +897,16 @@
                         }
                     },
                     {
+                        "name": "reopened",
+                        "in": "query",
+                        "description": "Filter tickets that were resolved and reopened",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    },
+                    {
                         "name": "page",
                         "in": "query",
                         "required": false,
