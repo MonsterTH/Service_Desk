@@ -903,7 +903,7 @@
                         "required": false,
                         "schema": {
                             "type": "boolean",
-                            "example": true
+                            "example": false
                         }
                     },
                     {

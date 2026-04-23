@@ -78,7 +78,7 @@ class TicketController extends Controller
                 in: 'query',
                 required: false,
                 description: 'Filter tickets that were resolved and reopened',
-                schema: new OA\Schema(type: 'boolean', example: true)
+                schema: new OA\Schema(type: 'boolean', example: false)
             ),
             new OA\Parameter(
                 name: 'page',
