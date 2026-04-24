@@ -56,17 +56,8 @@ class CreateTicket extends Tool
     public function outputSchema(JsonSchema $schema): array
     {
         return [
-            'title' => $schema->string()
-                ->description('Title of the Tickets.')
-                ->required(),
-
-            'description' => $schema->string()
-                ->description('Description of the Tickets.')
-                ->nullable(),
-
-            'category_id' => $schema->integer()
-                ->description('Id of the category.')
-                ->required(),
+            'success' => $schema->boolean()->required(),
+            'ticket' => $schema->object()->required(),
         ];
     }
 }
