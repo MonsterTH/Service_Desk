@@ -8,6 +8,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 use App\Models\Ticket;
+use App\Http\Resources\TicketResource;
 
 #[Description('Create a ticket for the Service Desk Server.')]
 class CreateTicket extends Tool
@@ -33,7 +34,8 @@ class CreateTicket extends Tool
         ]);
 
         return Response::json([
-            'success' => true
+            'success' => true,
+            'ticket' => new TicketResource($ticket)
         ]);
     }
 
@@ -54,7 +56,7 @@ class CreateTicket extends Tool
     public function outputSchema(JsonSchema $schema): array
     {
         return [
-            'title' => $schema->number()
+            'title' => $schema->string()
                 ->description('Title of the Tickets.')
                 ->required(),
 
