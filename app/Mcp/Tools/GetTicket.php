@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mcp\Resources;
+namespace App\Mcp\Tools;
 
 use App\Models\Ticket;
 use Laravel\Mcp\Request;

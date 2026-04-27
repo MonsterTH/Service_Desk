@@ -8,11 +8,11 @@ use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Attributes\Version;
 use App\Mcp\Tools\CreateTicket;
 use App\Mcp\Tools\DeleteTicket;
-use App\Mcp\Resources\GetAllTickets;
-use App\Mcp\Resources\GetTicket;
+use App\Mcp\Tools\GetAllTickets;
+use App\Mcp\Tools\GetTicket;
 use App\Mcp\Tools\UpdateTicket;
 
-#[Name('Tickets Server')]
+#[Name('TicketsServer')]
 #[Version('1.0.0')]
 #[Instructions(
         'This server allows managing support tickets.
@@ -27,11 +27,11 @@ class TicketsServer extends Server
         CreateTicket::class,
         DeleteTicket::class,
         UpdateTicket::class,
+        GetAllTickets::class,
+        GetTicket::class,
     ];
 
     protected array $resources = [
-        GetAllTickets::class,
-        GetTicket::class,
     ];
 
     protected array $prompts = [

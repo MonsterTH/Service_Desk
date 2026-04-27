@@ -35,7 +35,18 @@ class CreateTicket extends Tool
 
         return Response::json([
             'success' => true,
-            'ticket' => new TicketResource($ticket)
+            'ticket' => [
+                'id'          => $ticket->id,
+                'title'       => $ticket->title,
+                'description' => $ticket->description,
+                'status'      => $ticket->status,
+                'priority'    => $ticket->priority,
+                'category_id' => $ticket->category_id,
+                'assigned_to' => $ticket->assigned_to,
+                'created_by'  => $ticket->created_by,
+                'created_at'  => $ticket->created_at,
+                'updated_at'  => $ticket->updated_at,
+            ],
         ]);
     }
 
@@ -63,9 +74,6 @@ class CreateTicket extends Tool
 
     public function outputSchema(JsonSchema $schema): array
     {
-        return [
-            'success' => $schema->boolean()->required(),
-            'ticket' => $schema->object()->required(),
-        ];
+        return [];
     }
 }

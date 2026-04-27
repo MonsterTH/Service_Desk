@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mcp\Resources;
+namespace App\Mcp\Tools;
 
 use Illuminate\Http\Request;
 use Laravel\Mcp\Response;

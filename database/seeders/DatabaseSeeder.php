@@ -30,25 +30,31 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // USERS
-        $admin = User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => bcrypt('password'),
+            ]
+        );
         $admin->assignRole('admin');
 
-        $agent = User::factory()->create([
-            'name' => 'Support Agent',
-            'email' => 'agent@example.com',
-            'password' => bcrypt('password'),
-        ]);
+        $agent = User::firstOrCreate(
+            ['email' => 'agent@example.com'],
+            [
+                'name' => 'Support Agent',
+                'password' => bcrypt('password'),
+            ]
+        );
         $agent->assignRole('agent');
 
-        $employee = User::factory()->create([
-            'name' => 'Employee User',
-            'email' => 'employee@example.com',
-            'password' => bcrypt('password'),
-        ]);
+        $employee = User::firstOrCreate(
+            ['email' => 'employee@example.com'],
+            [
+                'name' => 'Employee User',
+                'password' => bcrypt('password'),
+            ]
+        );
         $employee->assignRole('employee');
 
         User::factory(20)->create()->each(function ($user) {

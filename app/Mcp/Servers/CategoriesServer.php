@@ -12,7 +12,7 @@ use App\Mcp\Tools\CreateCategory;
 use App\Mcp\Tools\DeleteCategory;
 use App\Mcp\Tools\UpdateCategory;
 
-#[Name('Categories Server')]
+#[Name('CategoriesServer')]
 #[Version('1.0.0')]
 #[Instructions(
         'This server allows managing support categories.
