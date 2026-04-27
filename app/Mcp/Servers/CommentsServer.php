@@ -2,8 +2,8 @@
 
 namespace App\Mcp\Servers;
 
-use App\Mcp\Resources\GetAllComments;
-use App\Mcp\Resources\GetComment;
+use App\Mcp\Tools\GetAllComments;
+use App\Mcp\Tools\GetComment;
 use App\Mcp\Tools\CreateComment;
 use App\Mcp\Tools\DeleteComment;
 use App\Mcp\Tools\UpdateComment;
@@ -27,11 +27,12 @@ class CommentsServer extends Server
         CreateComment::class,
         DeleteComment::class,
         UpdateComment::class,
+        GetAllComments::class,
+        GetComment::class,
     ];
 
     protected array $resources = [
-        GetAllComments::class,
-        GetComment::class,
+        //
     ];
 
     protected array $prompts = [

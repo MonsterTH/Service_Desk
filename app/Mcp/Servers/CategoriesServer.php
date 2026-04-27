@@ -2,8 +2,6 @@
 
 namespace App\Mcp\Servers;
 
-use App\Mcp\Resources\GetAllCategories;
-use App\Mcp\Resources\GetCategory;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
@@ -11,6 +9,8 @@ use Laravel\Mcp\Server\Attributes\Version;
 use App\Mcp\Tools\CreateCategory;
 use App\Mcp\Tools\DeleteCategory;
 use App\Mcp\Tools\UpdateCategory;
+use App\Mcp\Tools\GetAllCategories;
+use App\Mcp\Tools\GetCategory;
 
 #[Name('CategoriesServer')]
 #[Version('1.0.0')]
@@ -27,11 +27,12 @@ class CategoriesServer extends Server
         CreateCategory::class,
         DeleteCategory::class,
         UpdateCategory::class,
+        GetAllCategories::class,
+        GetCategory::class
     ];
 
     protected array $resources = [
-        GetAllCategories::class,
-        GetCategory::class,
+        //
     ];
 
     protected array $prompts = [

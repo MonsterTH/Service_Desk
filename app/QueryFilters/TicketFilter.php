@@ -6,42 +6,34 @@ use Illuminate\Http\Request;
 
 class TicketFilter
 {
-    public function apply($query, Request $request)
+    public function apply($query, array $filters)
     {
         return $query
-            ->when($request->filled('status'), fn ($q) =>
-                $q->where('status', $request->status)
+            ->when(!empty($filters['status']), fn ($q) =>
+                $q->where('status', $filters['status'])
             )
-            ->when($request->filled('priority'), fn ($q) =>
-                $q->where('priority', $request->priority)
+            ->when(!empty($filters['priority']), fn ($q) =>
+                $q->where('priority', $filters['priority'])
             )
-            ->when($request->filled('category_id'), fn ($q) =>
-                $q->where('category_id', $request->category_id)
+            ->when(!empty($filters['category_id']), fn ($q) =>
+                $q->where('category_id', $filters['category_id'])
             )
-            ->when($request->filled('assigned_to'), fn ($q) =>
-                $q->where('assigned_to', $request->assigned_to)
+            ->when(!empty($filters['assigned_to']), fn ($q) =>
+                $q->where('assigned_to', $filters['assigned_to'])
             )
-            ->when($request->filled('created_from'), fn ($q) =>
-                $q->whereDate('created_at', '>=', $request->created_from)
+            ->when(!empty($filters['created_from']), fn ($q) =>
+                $q->whereDate('created_at', '>=', $filters['created_from'])
             )
-            ->when($request->filled('created_to'), fn ($q) =>
-                $q->whereDate('created_at', '<=', $request->created_to)
+            ->when(!empty($filters['created_to']), fn ($q) =>
+                $q->whereDate('created_at', '<=', $filters['created_to'])
             )
-            ->when($request->filled('search'), fn ($q) =>
-                $q->where('title', 'like', "%{$request->search}%")
+            ->when(!empty($filters['search']), fn ($q) =>
+                $q->where('title', 'like', "%{$filters['search']}%")
             )
-            ->when($request->filled('reopened'), function ($q) use ($request) {
-                if ($request->boolean('reopened')) {
+            ->when(isset($filters['reopened']), function ($q) use ($filters) {
+                if ($filters['reopened']) {
                     $q->where('reopened', true);
                 }
             });
-            // ->when($request->has('reopened') && $request->input('reopened') == 'true', function ($query) {
-            //     $query->where('status', 'open')
-            //         ->whereHas('logs', function ($q) {
-            //             $q->where('action', 'status_changed')
-            //             ->where('changes->from', 'resolved')
-            //             ->where('changes->to', 'open');
-            //         });
-            // });
     }
 }

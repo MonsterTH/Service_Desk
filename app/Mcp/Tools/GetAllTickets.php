@@ -5,19 +5,20 @@ namespace App\Mcp\Tools;
 use Illuminate\Http\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Resource;
+use Laravel\Mcp\Server\Tool;
 use App\Models\Ticket;
 use App\QueryFilters\TicketFilter;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Resources\TicketResource;
 
 #[Description('Retrieve a list of tickets with optional filters such as status, priority, category, or assigned user.')]
-class GetAllTickets extends Resource
+class GetAllTickets extends Tool
 {
     use AuthorizesRequests;
 
-    public function handle(Request $request): Response
+    public function handle(\Laravel\Mcp\Request $request): Response
     {
+        /** @var \App\Models\User $user */
         $user = $request->user();
 
         if (! $user) {
@@ -29,7 +30,9 @@ class GetAllTickets extends Resource
         $query = Ticket::with(['category', 'creator', 'assignee']);
 
         $filter = app(TicketFilter::class);
-        $query = $filter->apply($query, $request);
+        $filters = $request->all();
+
+        $query = $filter->apply($query, $filters);
 
         if ($user->hasRole('agent')) {
             $query->where('assigned_to', $user->id);
@@ -39,7 +42,7 @@ class GetAllTickets extends Resource
             $query->where('created_by', $user->id);
         }
 
-        $perPage = $request->input('ItemsPerPage', 5);
+        $perPage = $filters['ItemsPerPage'] ?? 5;
 
         $paginator = $query->paginate($perPage);
 

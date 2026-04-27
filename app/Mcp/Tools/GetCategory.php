@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Mcp\Resources;
+namespace App\Mcp\Tools;
 
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Resource;
+use Laravel\Mcp\Server\Tool;
 use App\Models\Category;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 #[Description('Get a single category by ID.')]
-class GetCategory extends Resource
+class GetCategory extends Tool
 {
     use AuthorizesRequests;
 
