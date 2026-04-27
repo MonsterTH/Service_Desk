@@ -10,7 +10,7 @@ use App\Models\Category;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-#[Description('Get a single category by ID (respects policy).')]
+#[Description('Get a single category by ID.')]
 class GetCategory extends Resource
 {
     use AuthorizesRequests;
