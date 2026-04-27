@@ -12,15 +12,16 @@ use App\Mcp\Resources\GetAllTickets;
 use App\Mcp\Resources\GetTicket;
 use App\Mcp\Tools\UpdateTicket;
 
-#[Name('Service Desk Server')]
+#[Name('Tickets Server')]
 #[Version('1.0.0')]
 #[Instructions(
         'This server allows managing support tickets.
-        Use CreateTicket to create new tickets.
-        Use DeleteTicket to soft delete tickets (only when explicitly requested).
+        Use CreateTicket to create tickets.
+        Use DeleteTicket to soft delete (only when explicitly requested) a ticket.
         Always confirm before deleting a ticket.
+        Use UpdateTicket to update a ticket.
     ')]
-class ServiceDeskServer extends Server
+class TicketsServer extends Server
 {
     protected array $tools = [
         CreateTicket::class,

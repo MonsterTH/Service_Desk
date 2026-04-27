@@ -68,6 +68,4 @@ class GetAllTickets extends Resource
             'ItemsPerPage' => $schema->integer()->nullable(),
         ];
     }
-
-
 }

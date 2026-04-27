@@ -1,11 +1,11 @@
 <?php
 
 use Laravel\Mcp\Facades\Mcp;
-use App\Mcp\Servers\ServiceDeskServer;
+use App\Mcp\Servers\TicketsServer;
+use App\Mcp\Servers\CategoriesServer;
 
-Mcp::web('/mcp/tickets', ServiceDeskServer::class)
+Mcp::web('/mcp/tickets', TicketsServer::class)
     ->middleware(['auth:sanctum']);
 
-    //Falta por isso &reopened=false&page=1&ItemsPerPage=5
-    // 1º Ou utilizar template
-    // 2º
+Mcp::web('/mcp/categories', CategoriesServer::class)
+    ->middleware(['auth:sanctum']);
