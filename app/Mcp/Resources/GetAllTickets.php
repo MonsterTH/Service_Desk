@@ -61,8 +61,13 @@ class GetAllTickets extends Resource
             'category_id' => $schema->integer()->nullable(),
             'assigned_to' => $schema->integer()->nullable(),
             'search' => $schema->string()->nullable(),
+            'created_from' => $schema->string()->nullable(),
+            'created_to' => $schema->string()->nullable(),
+            'reopened' => $schema->boolean()->nullable(),
             'page' => $schema->integer()->nullable(),
             'ItemsPerPage' => $schema->integer()->nullable(),
         ];
     }
+
+
 }

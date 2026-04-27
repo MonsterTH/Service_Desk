@@ -29,6 +29,10 @@ class DeleteTicket extends Tool
             'ticket_id' => 'required|exists:tickets,id',
         ]);
 
+        if (! $data['confirm']) {
+            return Response::error('You must confirm before deleting this ticket.', 400);
+        }
+
         $ticket = Ticket::findOrFail($data['ticket_id']);
 
         $this->authorize('delete', $ticket);
@@ -51,6 +55,10 @@ class DeleteTicket extends Tool
         return [
             'ticket_id' => $schema->integer()
                 ->description('The ID of the ticket to delete')
+                ->required(),
+
+            'confirm' => $schema->boolean()
+                ->description('Must be TRUE only if the user explicitly confirmed deletion (never guess)')
                 ->required(),
         ];
     }

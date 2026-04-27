@@ -47,9 +47,17 @@ class CreateTicket extends Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'title' => $schema->string()->description('The title of the ticket.')->required(),
-            'description' => $schema->string()->description('The description of the ticket.')->nullable(),
-            'category_id' => $schema->integer()->description('The ID of the category the ticket belongs to.')->required(),
+            'title' => $schema->string()
+                ->description('Short summary of the issue (e.g., "Email not working")')
+                ->required(),
+
+            'description' => $schema->string()
+                ->description('Detailed explanation of the problem')
+                ->nullable(),
+
+            'category_id' => $schema->integer()
+                ->description('Category ID (must exist in categories table)')
+                ->required(),
         ];
     }
 

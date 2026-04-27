@@ -6,6 +6,8 @@ use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Attributes\Version;
+use App\Mcp\Tools\CreateTicket;
+use App\Mcp\Tools\DeleteTicket;
 
 #[Name('Service Desk Server')]
 #[Version('1.0.0')]
@@ -18,8 +20,8 @@ use Laravel\Mcp\Server\Attributes\Version;
 class ServiceDeskServer extends Server
 {
     protected array $tools = [
-        \App\Mcp\Tools\CreateTicket::class,
-        \App\Mcp\Tools\DeleteTicket::class,
+        CreateTicket::class,
+        DeleteTicket::class,
     ];
 
     protected array $resources = [
