@@ -74,7 +74,7 @@ class CreateComment extends Tool
 
             'is_internal' => $schema->boolean()
                 ->description('Only agents/admins can set internal comments')
-                ->nullable(),
+                ->required(),
         ];
     }
 }

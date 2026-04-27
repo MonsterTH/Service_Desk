@@ -17,13 +17,13 @@ class GetCategory extends Tool
 
     public function handle(Request $request): Response
     {
-        $this->authorize('view', Category::class);
-
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
         ]);
 
         $category = Category::findOrFail($data['category_id']);
+
+        $this->authorize('view', $category);
 
         return Response::json([
             'data' => new CategoryResource($category),
