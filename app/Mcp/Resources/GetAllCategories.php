@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace App\Mcp\Resources;
 
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Tool;
+use Laravel\Mcp\Server\Resource;
 use App\Models\Category;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 #[Description('List all categories.')]
-class GetAllCategories extends Tool
+class GetAllCategories extends Resource
 {
     use AuthorizesRequests;
 

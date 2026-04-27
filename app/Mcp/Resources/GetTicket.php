@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace App\Mcp\Resources;
 
 use App\Models\Ticket;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
-use Laravel\Mcp\Server\Tool;
+use Laravel\Mcp\Server\Resource;
 use Laravel\Mcp\Server\Attributes\Description;
 
 #[Description('Get a single ticket by ID')]
-class GetTicket extends Tool
+class GetTicket extends Resource
 {
     public function handle(Request $request): Response
     {

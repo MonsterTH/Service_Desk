@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace App\Mcp\Resources;
 
 use App\Models\Comment;
 use App\Models\Ticket;
@@ -10,10 +10,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Tool;
+use Laravel\Mcp\Server\Resource;
 
 #[Description('Get all comments for a specific ticket (filtered by role).')]
-class GetAllComments extends Tool
+class GetAllComments extends Resource
 {
     use AuthorizesRequests;
 

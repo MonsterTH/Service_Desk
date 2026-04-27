@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace App\Mcp\Resources;
 
 use App\Models\Comment;
 use App\Http\Resources\CommentResource;
@@ -9,10 +9,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Tool;
+use Laravel\Mcp\Server\Resource;
 
 #[Description('Get a specific comment by ID (respecting permissions and visibility rules).')]
-class GetComment extends Tool
+class GetComment extends Resource
 {
     use AuthorizesRequests;
 

@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace App\Mcp\Resources;
 
 use Illuminate\Http\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Tool;
 use App\Models\Ticket;
 use App\QueryFilters\TicketFilter;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Resources\TicketResource;
+use Laravel\Mcp\Server\Resource;
 
 #[Description('Retrieve a list of tickets with optional filters such as status, priority, category, or assigned user.')]
-class GetAllTickets extends Tool
+class GetAllTickets extends Resource
 {
     use AuthorizesRequests;
 
-    public function handle(\Laravel\Mcp\Request $request): Response
+    public function handle(Request $request): Response
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
