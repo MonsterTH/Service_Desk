@@ -8,9 +8,11 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 use App\Models\Ticket;
+use Laravel\Mcp\Server\Tools\Annotations\IsDestructive;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 #[Description('Delete a ticket from the Service Desk.')]
+#[IsDestructive]
 class DeleteTicket extends Tool
 {
     use AuthorizesRequests;
@@ -27,10 +29,11 @@ class DeleteTicket extends Tool
 
         $data = $request->validate([
             'ticket_id' => 'required|exists:tickets,id',
+            'confirm'   => 'required|boolean',
         ]);
 
         if (! $data['confirm']) {
-            return Response::error('You must confirm before deleting this ticket.', 400);
+            return Response::error('You must confirm before deleting this ticket.');
         }
 
         $ticket = Ticket::findOrFail($data['ticket_id']);
