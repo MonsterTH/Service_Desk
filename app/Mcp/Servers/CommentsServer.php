@@ -13,7 +13,7 @@ use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Attributes\Version;
 
 #[Name('CommentsServer')]
-#[Version('1.0.0')]
+#[Version('0.0.1')]
 #[Instructions(
         'This server allows managing the comments on a ticket.
         Use CreateComment to create comments.

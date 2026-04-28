@@ -8,22 +8,23 @@ use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Resource;
 use App\Models\Category;
 use App\Http\Resources\CategoryResource;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 #[Description('Get a single category by ID.')]
 class GetCategory extends Resource
 {
-    use AuthorizesRequests;
-
     public function handle(Request $request): Response
     {
+        $user = $request->user();
+
+        if (!$user) {
+            return Response::error('Unauthorized.');
+        }
+
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
         ]);
 
         $category = Category::findOrFail($data['category_id']);
-
-        $this->authorize('view', $category);
 
         return Response::json([
             'data' => new CategoryResource($category),

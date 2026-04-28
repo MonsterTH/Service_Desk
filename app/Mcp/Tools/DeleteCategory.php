@@ -8,57 +8,57 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsDestructive;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Category;
 
-#[Description('This Tool Deletes an Category (admin only).')]
+#[Description('Delete a category (admin only).')]
 #[IsDestructive]
 class DeleteCategory extends Tool
 {
-    use AuthorizesRequests;
-    /**
-     * Handle the tool request.
-     */
     public function handle(Request $request): Response
     {
+        /** @var \App\Models\User $user */
         $user = $request->user();
 
-        if (! $user) {
-            return Response::error('Unauthorized');
+        if (!$user) {
+            return Response::error('Unauthorized.');
+        }
+
+        if (!$user->hasRole('admin')) {
+            return Response::error('Only admins can delete categories.');
         }
 
         $data = $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'confirm'   => 'required|boolean',
+            'confirm'     => 'required|boolean',
         ]);
 
-        if (! $data['confirm']) {
+        if (!$data['confirm']) {
             return Response::error('You must confirm before deleting this category.');
         }
 
         $category = Category::findOrFail($data['category_id']);
 
-        $this->authorize('delete', $category);
+        if ($category->tickets()->exists()) {
+            return Response::error('Cannot delete a category that has tickets associated.');
+        }
+
+        if ($category->is_active) {
+            return Response::error('Cannot delete an active category. Deactivate it first.');
+        }
 
         $category->delete();
 
         return Response::json([
-            'message' => 'Category deleted successfully'
+            'message' => 'Category deleted successfully.',
         ]);
     }
 
-    /**
-     * Get the tool's input schema.
-     *
-     * @return array<string, JsonSchema>
-     */
     public function schema(JsonSchema $schema): array
     {
         return [
             'category_id' => $schema->integer()
-                ->description('The ID of the category to delete')
+                ->description('ID of the category to delete')
                 ->required(),
-
             'confirm' => $schema->boolean()
                 ->description('Must be TRUE only if the user explicitly confirmed deletion (never guess)')
                 ->required(),

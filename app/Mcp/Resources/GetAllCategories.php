@@ -8,19 +8,20 @@ use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Resource;
 use App\Models\Category;
 use App\Http\Resources\CategoryResource;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 #[Description('List all categories.')]
 class GetAllCategories extends Resource
 {
-    use AuthorizesRequests;
-
     public function handle(Request $request): Response
     {
-        $this->authorize('viewAny', Category::class);
+        $user = $request->user();
+
+        if (!$user) {
+            return Response::error('Unauthorized.');
+        }
 
         $data = $request->validate([
-            'page' => 'sometimes|integer|min:1',
+            'page'         => 'sometimes|integer|min:1',
             'ItemsPerPage' => 'sometimes|integer|min:1|max:100',
         ]);
 
@@ -35,8 +36,8 @@ class GetAllCategories extends Resource
             'data' => CategoryResource::collection($paginator->items()),
             'meta' => [
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'total' => $paginator->total(),
+                'last_page'    => $paginator->lastPage(),
+                'total'        => $paginator->total(),
             ],
         ]);
     }
@@ -44,7 +45,7 @@ class GetAllCategories extends Resource
     public function schema(\Illuminate\Contracts\JsonSchema\JsonSchema $schema): array
     {
         return [
-            'page' => $schema->integer()->nullable(),
+            'page'         => $schema->integer()->nullable(),
             'ItemsPerPage' => $schema->integer()->nullable(),
         ];
     }

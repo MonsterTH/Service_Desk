@@ -13,13 +13,13 @@ use App\Mcp\Resources\GetAllCategories;
 use App\Mcp\Resources\GetCategory;
 
 #[Name('CategoriesServer')]
-#[Version('1.0.0')]
+#[Version('0.0.1')]
 #[Instructions(
         'This server allows managing support categories.
-        Use CreateTicket to create categories.
-        Use DeleteTicket to soft delete (only when explicitly requested) a category.
+        Use CreateCategory to create categories.
+        Use DeleteCategory to soft delete (only when explicitly requested) a category.
         Always confirm before deleting a category.
-        Use UpdateTicket to update a category.
+        Use UpdateCategory to update a category.
     ')]
 class CategoriesServer extends Server
 {

@@ -4,7 +4,6 @@ namespace App\Mcp\Tools;
 
 use App\Models\Comment;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
@@ -15,15 +14,13 @@ use Laravel\Mcp\Server\Tools\Annotations\IsDestructive;
 #[IsDestructive]
 class DeleteComment extends Tool
 {
-    use AuthorizesRequests;
-
     public function handle(Request $request): Response
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        if (! $user) {
-            return Response::error('Unauthorized');
+        if (!$user) {
+            return Response::error('Unauthorized.');
         }
 
         $data = $request->validate([
@@ -31,19 +28,24 @@ class DeleteComment extends Tool
             'confirm'    => 'required|boolean',
         ]);
 
-        if (! $data['confirm']) {
+        if (!$data['confirm']) {
             return Response::error('You must confirm before deleting this comment.');
         }
 
         $comment = Comment::findOrFail($data['comment_id']);
 
-        // Policy
-        $this->authorize('delete', $comment);
+        // ✅ Replica lógica da CommentPolicy::delete()
+        $canDelete = $user->hasRole('admin')
+            || $comment->user_id === $user->id;
+
+        if (!$canDelete) {
+            return Response::error('You do not have permission to delete this comment.');
+        }
 
         $comment->delete();
 
         return Response::json([
-            'message' => 'Comment deleted successfully'
+            'message' => 'Comment deleted successfully.',
         ]);
     }
 
@@ -51,9 +53,8 @@ class DeleteComment extends Tool
     {
         return [
             'comment_id' => $schema->integer()
-                ->description('The ID of the comment to delete')
+                ->description('ID of the comment to delete')
                 ->required(),
-
             'confirm' => $schema->boolean()
                 ->description('Must be TRUE only if the user explicitly confirmed deletion')
                 ->required(),

@@ -5,7 +5,6 @@ namespace App\Mcp\Tools;
 use App\Models\Comment;
 use App\Http\Resources\CommentResource;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
@@ -14,15 +13,12 @@ use Laravel\Mcp\Server\Tool;
 #[Description('Update a comment (only owner and if ticket is not in final state).')]
 class UpdateComment extends Tool
 {
-    use AuthorizesRequests;
-
     public function handle(Request $request): Response
     {
-        /** @var \App\Models\User $user */
         $user = $request->user();
 
-        if (! $user) {
-            return Response::error('Unauthorized');
+        if (!$user) {
+            return Response::error('Unauthorized.');
         }
 
         $data = $request->validate([
@@ -32,12 +28,12 @@ class UpdateComment extends Tool
 
         $comment = Comment::with('ticket')->findOrFail($data['comment_id']);
 
-        // Policy
-        $this->authorize('update', $comment);
-
-        // (extra segurança opcional)
         if ($comment->ticket->isFinalState()) {
-            return Response::error('Cannot update comment on closed/resolved ticket');
+            return Response::error('Cannot update comment on a closed ticket.');
+        }
+
+        if ($comment->user_id !== $user->id) {
+            return Response::error('You can only update your own comments.');
         }
 
         $comment->update([
@@ -56,7 +52,6 @@ class UpdateComment extends Tool
             'comment_id' => $schema->integer()
                 ->description('ID of the comment to update')
                 ->required(),
-
             'comment' => $schema->string()
                 ->description('Updated comment content')
                 ->nullable(),
