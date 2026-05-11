@@ -9,7 +9,7 @@ use Laravel\Mcp\Server\Attributes\Version;
 use App\Mcp\Tools\CreateTicket;
 use App\Mcp\Tools\DeleteTicket;
 use App\Mcp\Tools\UpdateTicket;
-use App\Mcp\Tools\GetTicket;
+use App\Mcp\Resources\GetTicket;
 use App\Mcp\Resources\GetAllTickets;
 
 #[Name('TicketsServer')]
@@ -21,11 +21,11 @@ class TicketsServer extends Server
         CreateTicket::class,
         DeleteTicket::class,
         UpdateTicket::class,
-        GetTicket::class,
     ];
 
     protected array $resources = [
         GetAllTickets::class,
+        GetTicket::class,
     ];
 
     protected array $prompts = [];

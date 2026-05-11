@@ -78,13 +78,23 @@ class UpdateTicket extends Tool
             }
         }
 
-        $ticket->update(collect($data)->except('ticket_id')->toArray());
+        $updateData = collect($data)
+            ->except('ticket_id')
+            ->toArray();
 
-        return Response::json([
-            'success' => true,
-            'ticket'  => $ticket->fresh(['category', 'creator', 'assignee']),
-        ]);
-    }
+        if (isset($updateData['status'])) {
+            $ticket->markReopened($updateData['status']);
+
+            $updateData['reopened'] = $ticket->reopened;
+        }
+
+        $ticket->update($updateData);
+
+                return Response::json([
+                    'success' => true,
+                    'ticket'  => $ticket->fresh(['category', 'creator', 'assignee']),
+                ]);
+            }
 
     public function schema(JsonSchema $schema): array
     {

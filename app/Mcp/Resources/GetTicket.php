@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Mcp\Tools;
+namespace App\Mcp\Resources;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
-use Laravel\Mcp\Server\Tool;
+use Laravel\Mcp\Server\Resource;
 use App\Models\Ticket;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
 #[Description('Get a single ticket by ID')]
 #[IsReadOnly]
-class GetTicket extends Tool
+class GetTicket extends Resource
 {
     public function handle(Request $request): Response
     {

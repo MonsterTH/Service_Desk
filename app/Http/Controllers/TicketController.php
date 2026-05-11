@@ -119,7 +119,7 @@ class TicketController extends Controller
 
         $query = Ticket::with(['category', 'creator', 'assignee']);
 
-        $query = $filter->apply($query, $request);
+        $query = $filter->apply($query, $request->all());
 
         $user = $request->user();
 

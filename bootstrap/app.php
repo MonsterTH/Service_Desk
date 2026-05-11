@@ -7,6 +7,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -59,19 +60,17 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (\Throwable $e, $request) {
-            if ($request->is('api/*')) {
 
-                $status = $e instanceof HttpExceptionInterface
-                    ? $e->getStatusCode()
-                    : 500;
+            $status = $e instanceof HttpExceptionInterface
+                ? $e->getStatusCode()
+                : 500;
 
-                return response()->json([
-                    'message' => app()->hasDebugModeEnabled()
-                        ? $e->getMessage()
-                        : 'Server Error',
-                ], $status);
-            }
+            return response()->json([
+                'message' => app()->hasDebugModeEnabled()
+                    ? $e->getMessage()
+                    : 'Server Error',
+                'path' => $request->path(),
+            ], $status);
         });
-
     })
     ->create();
