@@ -1353,6 +1353,50 @@
                     }
                 }
             }
+        },
+        "/api/stats/resolved-tickets": {
+            "get": {
+                "tags": [
+                    "Statistics"
+                ],
+                "summary": "Show resolved/closed tickets count by agents/admins",
+                "operationId": "8b502ed11bb5819d11f425f942a9921e",
+                "responses": {
+                    "200": {
+                        "description": "Resolved tickets statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            },
+                                            "resolved_tickets_count": {
+                                                "type": "integer",
+                                                "example": 15
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -1606,6 +1650,10 @@
         {
             "name": "Tickets",
             "description": "Ticket management system (CRUD, assignment, status and priority updates)"
+        },
+        {
+            "name": "Statistics",
+            "description": "Statistics"
         }
     ],
     "security": [

@@ -485,4 +485,59 @@ class TicketController extends Controller
 
         return new TicketResource($ticket);
     }
+
+    #[OA\Get(
+        path: '/api/stats/resolved-tickets',
+        summary: 'Show resolved/closed tickets count by agents/admins',
+        tags: ['Statistics'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Resolved tickets statistics',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer',
+                                example: 1
+                            ),
+                            new OA\Property(
+                                property: 'name',
+                                type: 'string',
+                                example: 'John Doe'
+                            ),
+                            new OA\Property(
+                                property: 'resolved_tickets_count',
+                                type: 'integer',
+                                example: 15
+                            ),
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(response: 401, description: 'Unauthorized'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+        ]
+    )]
+    public function resolvedStats()
+    {
+        $stats = User::role(['admin', 'agent'])
+            ->withCount([
+                'assignedTickets as resolved_tickets_count' => function ($query) {
+                    $query->whereIn('status', ['resolved', 'closed']);
+                }
+            ])
+            ->get(['id', 'name'])
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'resolved_tickets_count' => $user->resolved_tickets_count,
+                ];
+            });
+
+        return response()->json($stats);
+    }
 }

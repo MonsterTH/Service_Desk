@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('role:admin|agent');
     Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::patch('tickets/{ticket}/priority', [TicketController::class, 'updatePriority']);
+    Route::get('/stats/resolved-tickets', [TicketController::class, 'resolvedStats']);
 
     Route::get('tickets/{ticket}/comments', [CommentController::class, 'index']);
     Route::post('tickets/{ticket}/comments', [CommentController::class, 'store']);

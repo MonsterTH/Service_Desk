@@ -12,9 +12,13 @@ fi
 
 php artisan key:generate --force
 php artisan optimize:clear
-
 php artisan migrate --force
 php artisan db:seed --force
+
+touch /var/log/cron.log
+chmod 666 /var/log/cron.log
+
+cron
 
 echo "🚀 Laravel pronto!"
 
