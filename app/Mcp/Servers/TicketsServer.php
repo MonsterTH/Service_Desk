@@ -12,6 +12,7 @@ use App\Mcp\Tools\UpdateTicket;
 use App\Mcp\Tools\ResolvedStats;
 use App\Mcp\Resources\GetTicket;
 use App\Mcp\Resources\GetAllTickets;
+use App\Mcp\Prompts\TicketPrompt;
 
 #[Name('TicketsServer')]
 #[Version('0.0.1')]
@@ -30,5 +31,7 @@ class TicketsServer extends Server
         GetTicket::class,
     ];
 
-    protected array $prompts = [];
+    protected array $prompts = [
+        TicketPrompt::class,
+    ];
 }

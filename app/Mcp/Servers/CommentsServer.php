@@ -11,6 +11,7 @@ use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Attributes\Version;
+use App\Mcp\Prompts\CommentPrompt;
 
 #[Name('CommentsServer')]
 #[Version('0.0.1')]
@@ -35,6 +36,6 @@ class CommentsServer extends Server
     ];
 
     protected array $prompts = [
-        //
+        CommentPrompt::class,
     ];
 }

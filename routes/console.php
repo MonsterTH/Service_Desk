@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::job(new EscalateUnassignedTickets)->everyHour();
+Schedule::job(new EscalateUnassignedTickets)->dailyAt('09:00');
