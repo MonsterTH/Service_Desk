@@ -121,4 +121,24 @@ class TicketPolicy
 
         return true;
     }
+
+    public function Logs(User $user, Ticket $ticket): bool
+    {
+        return $user->hasRole('admin')
+            || ($user->hasRole('agent') && $this->isAssignedToUser($user, $ticket))
+            || $ticket->created_by === $user->id;
+    }
+
+    public function ratingStore(User $user, Ticket $ticket): bool
+    {
+        if (!$user->hasRole('employee')) {
+            return false;
+        }
+
+        if (! in_array($ticket->status, ['resolved', 'closed'])) {
+            return false;
+        }
+
+        return $ticket->created_by === $user->id;
+    }
 }

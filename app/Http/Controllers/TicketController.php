@@ -497,6 +497,7 @@ class TicketController extends Controller
                 content: new OA\JsonContent(
                     type: 'array',
                     items: new OA\Items(
+                        type: 'object',
                         properties: [
                             new OA\Property(
                                 property: 'id',
@@ -517,8 +518,16 @@ class TicketController extends Controller
                     )
                 )
             ),
-            new OA\Response(response: 401, description: 'Unauthorized'),
-            new OA\Response(response: 403, description: 'Forbidden'),
+
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden'
+            ),
         ]
     )]
     public function resolvedStats()
@@ -539,5 +548,234 @@ class TicketController extends Controller
             });
 
         return response()->json($stats);
+    }
+
+    #[OA\Get(
+        path: '/api/tickets/{ticket}/logs',
+        summary: 'Get ticket logs/history',
+        tags: ['Tickets'],
+        parameters: [
+            new OA\Parameter(
+                name: 'ticket',
+                in: 'path',
+                required: true,
+                description: 'Ticket ID',
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Ticket logs retrieved successfully',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        type: 'object',
+                        properties: [
+                            new OA\Property(
+                                property: 'id',
+                                type: 'integer',
+                                example: 1
+                            ),
+                            new OA\Property(
+                                property: 'ticket_id',
+                                type: 'integer',
+                                example: 5
+                            ),
+                            new OA\Property(
+                                property: 'user_id',
+                                type: 'integer',
+                                example: 2
+                            ),
+                            new OA\Property(
+                                property: 'action',
+                                type: 'string',
+                                example: 'status_updated'
+                            ),
+                            new OA\Property(
+                                property: 'old_value',
+                                type: 'string',
+                                nullable: true,
+                                example: 'open'
+                            ),
+                            new OA\Property(
+                                property: 'new_value',
+                                type: 'string',
+                                nullable: true,
+                                example: 'resolved'
+                            ),
+                            new OA\Property(
+                                property: 'created_at',
+                                type: 'string',
+                                format: 'date-time',
+                                example: '2026-05-12T10:30:00Z'
+                            ),
+
+                            new OA\Property(
+                                property: 'user',
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(
+                                        property: 'id',
+                                        type: 'integer',
+                                        example: 2
+                                    ),
+                                    new OA\Property(
+                                        property: 'name',
+                                        type: 'string',
+                                        example: 'Support Agent'
+                                    ),
+                                    new OA\Property(
+                                        property: 'email',
+                                        type: 'string',
+                                        example: 'agent@example.com'
+                                    ),
+                                ]
+                            ),
+                        ]
+                    )
+                )
+            ),
+
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden'
+            ),
+
+            new OA\Response(
+                response: 404,
+                description: 'Ticket not found'
+            ),
+        ]
+    )]
+    public function logs(Ticket $ticket)
+    {
+        $this->authorize('logs', $ticket);
+
+        return response()->json(
+            $ticket->logs()->with('user')->get()
+        );
+    }
+
+    #[OA\Post(
+        path: '/api/tickets/{ticket}/rating',
+        summary: 'Rate support service for a ticket',
+        tags: ['Tickets'],
+        parameters: [
+            new OA\Parameter(
+                name: 'ticket',
+                in: 'path',
+                required: true,
+                description: 'Ticket ID',
+                schema: new OA\Schema(type: 'integer')
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['rating'],
+                properties: [
+                    new OA\Property(
+                        property: 'rating',
+                        type: 'integer',
+                        minimum: 1,
+                        maximum: 5,
+                        example: 5
+                    ),
+                    new OA\Property(
+                        property: 'comment',
+                        type: 'string',
+                        example: 'Excellent support and fast response.'
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Rating created successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'id',
+                            type: 'integer',
+                            example: 1
+                        ),
+                        new OA\Property(
+                            property: 'ticket_id',
+                            type: 'integer',
+                            example: 5
+                        ),
+                        new OA\Property(
+                            property: 'user_id',
+                            type: 'integer',
+                            example: 3
+                        ),
+                        new OA\Property(
+                            property: 'rating',
+                            type: 'integer',
+                            example: 5
+                        ),
+                        new OA\Property(
+                            property: 'comment',
+                            type: 'string',
+                            example: 'Excellent support and fast response.'
+                        ),
+                        new OA\Property(
+                            property: 'created_at',
+                            type: 'string',
+                            format: 'date-time'
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Ticket not found'
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error or ticket already rated'
+            ),
+        ]
+    )]
+
+    public function ratingStore(Request $request, Ticket $ticket)
+    {
+        $this->authorize('ratingStore', $ticket);
+
+        if (! in_array($ticket->status, ['resolved', 'closed'])) {
+            return response()->json([
+                'message' => 'Only resolved or closed tickets can be rated.'
+            ], 422);
+        }
+
+        if ($ticket->rating) {
+            return response()->json([
+                'message' => 'This ticket has already been rated.'
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $rating = $ticket->rating()->create([
+            'user_id' => $request->user()->id,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? null,
+        ]);
+
+        return response()->json($rating, 201);
     }
 }

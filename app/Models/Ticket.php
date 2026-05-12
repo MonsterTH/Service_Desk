@@ -87,4 +87,9 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketLog::class)->latest();
     }
+
+    public function rating()
+    {
+        return $this->hasOne(TicketRating::class);
+    }
 }

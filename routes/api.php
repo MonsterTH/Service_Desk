@@ -23,6 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     Route::patch('tickets/{ticket}/priority', [TicketController::class, 'updatePriority']);
     Route::get('/stats/resolved-tickets', [TicketController::class, 'resolvedStats']);
+    Route::get('tickets/{ticket}/logs', [TicketController::class, 'logs']);
+    Route::post('tickets/{ticket}/rating', [TicketController::class, 'ratingStore']);
 
     Route::get('tickets/{ticket}/comments', [CommentController::class, 'index']);
     Route::post('tickets/{ticket}/comments', [CommentController::class, 'store']);

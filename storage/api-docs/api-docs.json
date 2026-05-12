@@ -1397,6 +1397,196 @@
                     }
                 }
             }
+        },
+        "/api/tickets/{ticket}/logs": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get ticket logs/history",
+                "operationId": "3f972f7f1529d4f13d9d4fb49d5e443a",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "Ticket ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket logs retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "ticket_id": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "action": {
+                                                "type": "string",
+                                                "example": "status_updated"
+                                            },
+                                            "old_value": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "example": "open"
+                                            },
+                                            "new_value": {
+                                                "type": [
+                                                    "string",
+                                                    "null"
+                                                ],
+                                                "example": "resolved"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2026-05-12T10:30:00Z"
+                                            },
+                                            "user": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Support Agent"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "agent@example.com"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
+        "/api/tickets/{ticket}/rating": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Rate support service for a ticket",
+                "operationId": "56158f64ba6410107827d4e588ce9a79",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "Ticket ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "rating": {
+                                        "type": "integer",
+                                        "example": 5,
+                                        "maximum": 5,
+                                        "minimum": 1
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Excellent support and fast response."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Rating created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "ticket_id": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 3
+                                        },
+                                        "rating": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "comment": {
+                                            "type": "string",
+                                            "example": "Excellent support and fast response."
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    },
+                    "422": {
+                        "description": "Validation error or ticket already rated"
+                    }
+                }
+            }
         }
     },
     "components": {
