@@ -84,4 +84,17 @@ class CommentPolicy
         return $user->hasRole('admin')
             || $comment->user_id === $user->id;
     }
+
+    public function count(User $user, Ticket $ticket): bool
+    {
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        if ($user->hasRole('agent')) {
+            return $ticket->assigned_to === $user->id;
+        }
+
+        return false;
+    }
 }

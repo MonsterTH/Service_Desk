@@ -12,6 +12,7 @@ use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Attributes\Version;
 use App\Mcp\Prompts\CommentPrompt;
+use App\Mcp\Tools\CountTicketComments;
 
 #[Name('CommentsServer')]
 #[Version('0.0.1')]
@@ -28,6 +29,7 @@ class CommentsServer extends Server
         CreateComment::class,
         DeleteComment::class,
         UpdateComment::class,
+        CountTicketComments::class,
     ];
 
     protected array $resources = [

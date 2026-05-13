@@ -357,4 +357,72 @@ class CommentController extends Controller
             201
         );
     }
+
+    #[OA\Get(
+        path: '/api/tickets/{ticket}/comments/count',
+        summary: 'Get comments count for a ticket',
+        tags: ['Comments'],
+        parameters: [
+            new OA\Parameter(
+                name: 'ticket',
+                in: 'path',
+                required: true,
+                description: 'Ticket ID',
+                schema: new OA\Schema(
+                    type: 'integer',
+                    example: 1
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Comments count retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'total',
+                            type: 'integer',
+                            example: 15
+                        ),
+                        new OA\Property(
+                            property: 'public',
+                            type: 'integer',
+                            example: 10
+                        ),
+                        new OA\Property(
+                            property: 'internal',
+                            type: 'integer',
+                            example: 5
+                        ),
+                    ]
+                )
+            ),
+
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden'
+            ),
+
+            new OA\Response(
+                response: 404,
+                description: 'Ticket not found'
+            ),
+        ]
+    )]
+    public function count(Ticket $ticket)
+    {
+        $this->authorize('count', [Comment::class, $ticket]);
+
+        return response()->json([
+            'total'    => $ticket->comments()->count(),
+            'public'   => $ticket->comments()->where('is_internal', false)->count(),
+            'internal' => $ticket->comments()->where('is_internal', true)->count(),
+        ]);
+    }
 }

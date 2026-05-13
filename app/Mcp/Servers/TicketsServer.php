@@ -13,6 +13,9 @@ use App\Mcp\Tools\ResolvedStats;
 use App\Mcp\Resources\GetTicket;
 use App\Mcp\Resources\GetAllTickets;
 use App\Mcp\Prompts\TicketPrompt;
+use App\Mcp\Tools\RateTicket;
+use App\Mcp\Resources\GetTicketLogs;
+
 
 #[Name('TicketsServer')]
 #[Version('0.0.1')]
@@ -24,11 +27,13 @@ class TicketsServer extends Server
         DeleteTicket::class,
         UpdateTicket::class,
         ResolvedStats::class,
+        RateTicket::class,
     ];
 
     protected array $resources = [
         GetAllTickets::class,
         GetTicket::class,
+        GetTicketLogs::class,
     ];
 
     protected array $prompts = [

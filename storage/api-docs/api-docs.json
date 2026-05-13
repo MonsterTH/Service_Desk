@@ -818,6 +818,62 @@
                 }
             }
         },
+        "/api/tickets/{ticket}/comments/count": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get comments count for a ticket",
+                "operationId": "b8bdf2def4252366cb5a64822e473716",
+                "parameters": [
+                    {
+                        "name": "ticket",
+                        "in": "path",
+                        "description": "Ticket ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comments count retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 15
+                                        },
+                                        "public": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "internal": {
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Ticket not found"
+                    }
+                }
+            }
+        },
         "/api/tickets": {
             "get": {
                 "tags": [
