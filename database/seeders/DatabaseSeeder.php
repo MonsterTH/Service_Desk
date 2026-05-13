@@ -48,6 +48,24 @@ class DatabaseSeeder extends Seeder
         );
         $agent->assignRole('agent');
 
+        $agent = User::firstOrCreate(
+            ['email' => 'agent2@example.com'],
+            [
+                'name' => 'Support Agent',
+                'password' => bcrypt('password'),
+            ]
+        );
+        $agent->assignRole('agent');
+
+        $agent = User::firstOrCreate(
+            ['email' => 'agent3@example.com'],
+            [
+                'name' => 'Support Agent',
+                'password' => bcrypt('password'),
+            ]
+        );
+        $agent->assignRole('agent');
+
         $employee = User::firstOrCreate(
             ['email' => 'employee@example.com'],
             [
@@ -64,6 +82,9 @@ class DatabaseSeeder extends Seeder
         // CATEGORIES
         $categories = Category::factory(10)->create();
 
+        // AGENTS
+        $agents = User::role('agent')->get();
+
         // TICKETS
         $activeCategories = Category::where('is_active', true)->get();
         $users = User::all();
@@ -71,7 +92,7 @@ class DatabaseSeeder extends Seeder
 
         Ticket::factory(100)->create([
             'created_by' => fn () => $users->random()->id,
-            'assigned_to' => $agent->id,
+            'assigned_to' => fn () => $agents->random()->id,
             'category_id' => fn () => $activeCategories->random()->id,
         ]);
 

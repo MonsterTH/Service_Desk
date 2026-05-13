@@ -36,11 +36,11 @@
                                     },
                                     "email": {
                                         "type": "string",
-                                        "example": "johndoe@example.com"
+                                        "example": "employee@example.com"
                                     },
                                     "password": {
                                         "type": "string",
-                                        "example": "password123"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
@@ -116,11 +116,11 @@
                                 "properties": {
                                     "email": {
                                         "type": "string",
-                                        "example": "john@example.com"
+                                        "example": "employee@example.com"
                                     },
                                     "password": {
                                         "type": "string",
-                                        "example": "password123"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"
