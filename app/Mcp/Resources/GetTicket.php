@@ -11,7 +11,6 @@ use App\Models\Ticket;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
 #[Description('Get a single ticket by ID')]
-#[IsReadOnly]
 class GetTicket extends Resource
 {
     public function handle(Request $request): Response
