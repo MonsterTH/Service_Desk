@@ -33,4 +33,10 @@ class CategoryPolicy
             && $category->tickets()->doesntExist()
             && !$category->is_active;
     }
+
+    public function stats(User $user, Category $category): bool
+    {
+        return $user->hasRole('admin')
+            || $user->hasRole('agent');
+    }
 }

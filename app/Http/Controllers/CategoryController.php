@@ -291,4 +291,84 @@ class CategoryController extends Controller
             'message' => 'Category deleted'
         ]);
     }
+
+    #[OA\Get(
+        path: '/api/categories/{category}/stats',
+        summary: 'Get ticket statistics for a category',
+        tags: ['Categories'],
+        parameters: [
+            new OA\Parameter(
+                name: 'category',
+                in: 'path',
+                required: true,
+                description: 'Category ID',
+                schema: new OA\Schema(
+                    type: 'integer',
+                    example: 1
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Category statistics retrieved successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'total',
+                            type: 'integer',
+                            example: 25
+                        ),
+                        new OA\Property(
+                            property: 'open',
+                            type: 'integer',
+                            example: 8
+                        ),
+                        new OA\Property(
+                            property: 'in_progress',
+                            type: 'integer',
+                            example: 6
+                        ),
+                        new OA\Property(
+                            property: 'resolved',
+                            type: 'integer',
+                            example: 7
+                        ),
+                        new OA\Property(
+                            property: 'closed',
+                            type: 'integer',
+                            example: 4
+                        ),
+                    ]
+                )
+            ),
+
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden'
+            ),
+
+            new OA\Response(
+                response: 404,
+                description: 'Category not found'
+            ),
+        ]
+    )]
+    public function stats(Category $category)
+    {
+        $this->authorize('stats', $category);
+
+        return response()->json([
+            'total'       => $category->tickets()->count(),
+            'open'        => $category->tickets()->where('status', 'open')->count(),
+            'in_progress' => $category->tickets()->where('status', 'in_progress')->count(),
+            'resolved'    => $category->tickets()->where('status', 'resolved')->count(),
+            'closed'      => $category->tickets()->where('status', 'closed')->count(),
+        ]);
+    }
 }

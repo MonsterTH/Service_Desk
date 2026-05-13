@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('categories/{category}', [CategoryController::class, 'show']);
+    Route::get('categories/{category}/stats', [CategoryController::class, 'stats']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {

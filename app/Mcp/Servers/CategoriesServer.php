@@ -12,6 +12,7 @@ use App\Mcp\Tools\UpdateCategory;
 use App\Mcp\Resources\GetAllCategories;
 use App\Mcp\Resources\GetCategory;
 use App\Mcp\Prompts\CategoryPrompt;
+use App\Mcp\Tools\GetCategoryStats;
 
 #[Name('CategoriesServer')]
 #[Version('0.0.1')]
@@ -28,6 +29,7 @@ class CategoriesServer extends Server
         CreateCategory::class,
         DeleteCategory::class,
         UpdateCategory::class,
+        GetCategoryStats::class,
     ];
 
     protected array $resources = [
