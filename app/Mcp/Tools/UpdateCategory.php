@@ -30,7 +30,6 @@ class UpdateCategory extends Tool
             'category_id' => 'required|exists:categories,id',
             'name'        => 'sometimes|string|max:255',
             'description' => 'sometimes|nullable|string',
-            'is_active'   => 'sometimes|boolean',
         ]);
 
         $category = Category::findOrFail($data['category_id']);
@@ -40,7 +39,6 @@ class UpdateCategory extends Tool
             'description' => array_key_exists('description', $data)
                 ? $data['description']
                 : $category->description,
-            'is_active'   => $data['is_active'] ?? $category->is_active,
         ]);
 
         return Response::json([
@@ -60,9 +58,6 @@ class UpdateCategory extends Tool
                 ->nullable(),
             'description' => $schema->string()
                 ->description('New description')
-                ->nullable(),
-            'is_active' => $schema->boolean()
-                ->description('Active state')
                 ->nullable(),
         ];
     }

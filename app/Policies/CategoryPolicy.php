@@ -39,4 +39,9 @@ class CategoryPolicy
         return $user->hasRole('admin')
             || $user->hasRole('agent');
     }
+
+    public function toggle(User $user, Category $category): bool
+    {
+        return $user->hasRole('admin');
+    }
 }

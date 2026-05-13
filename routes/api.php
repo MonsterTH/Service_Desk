@@ -50,4 +50,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::apiResource('categories', CategoryController::class)
         ->except(['index', 'show']);
+
+    Route::patch('categories/{category}/toggle', [CategoryController::class, 'toggle']);
 });

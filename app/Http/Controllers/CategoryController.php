@@ -209,12 +209,7 @@ class CategoryController extends Controller
                         property: 'description',
                         type: 'string',
                         example: 'All electronic items'
-                    ),
-                    new OA\Property(
-                        property: 'is_active',
-                        type: 'boolean',
-                        example: true
-                    ),
+                    )
                 ]
             )
         ),
@@ -252,7 +247,6 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'is_active' => 'boolean',
         ]);
 
         $category->update($validated);
@@ -369,6 +363,81 @@ class CategoryController extends Controller
             'in_progress' => $category->tickets()->where('status', 'in_progress')->count(),
             'resolved'    => $category->tickets()->where('status', 'resolved')->count(),
             'closed'      => $category->tickets()->where('status', 'closed')->count(),
+        ]);
+    }
+
+    #[OA\Patch(
+        path: '/api/categories/{category}/toggle',
+        summary: 'Activate or deactivate a category',
+        tags: ['Categories'],
+        parameters: [
+            new OA\Parameter(
+                name: 'category',
+                in: 'path',
+                required: true,
+                description: 'Category ID',
+                schema: new OA\Schema(
+                    type: 'integer',
+                    example: 1
+                )
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Category status updated successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'is_active',
+                            type: 'boolean',
+                            example: true
+                        ),
+                        new OA\Property(
+                            property: 'message',
+                            type: 'string',
+                            example: 'Category activated'
+                        ),
+                    ]
+                )
+            ),
+
+            new OA\Response(
+                response: 401,
+                description: 'Unauthorized'
+            ),
+
+            new OA\Response(
+                response: 403,
+                description: 'Forbidden'
+            ),
+
+            new OA\Response(
+                response: 404,
+                description: 'Category not found'
+            ),
+        ]
+    )]
+    public function toggle(Category $category)
+    {
+        $this->authorize('toggle', $category);
+
+        if ($category->is_active && $category->tickets()->exists()) {
+            return response()->json([
+                'message' => 'Cannot deactivate a category that has tickets associated.',
+                'tickets_count' => $category->tickets()->count(),
+            ], 422);
+        }
+
+        $category->update([
+            'is_active' => !$category->is_active
+        ]);
+
+        return response()->json([
+            'is_active' => $category->is_active,
+            'message'   => $category->is_active
+                ? 'Category activated'
+                : 'Category deactivated',
         ]);
     }
 }
